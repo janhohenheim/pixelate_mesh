@@ -1,5 +1,6 @@
 #![forbid(missing_docs)]
 //! This crate provides a plugin for pixelating meshes.
+
 use bevy::{
     core_pipeline::clear_color::ClearColorConfig,
     prelude::*,

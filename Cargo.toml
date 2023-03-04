@@ -10,16 +10,6 @@ edition = "2021"
 version = "0.9.1"
 default-features = false
 features = [
-    "animation",
     "bevy_asset",
-    "bevy_audio",
-    "bevy_gilrs",
-    "bevy_scene",
-    "bevy_winit",
     "render",
-    "png",
-    "hdr",
-    "vorbis",
-    "x11",
-    "filesystem_watcher",
 ]
