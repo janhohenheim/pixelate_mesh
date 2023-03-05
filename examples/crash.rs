@@ -18,7 +18,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_system(setup)
-        .add_startup_system(load_gltf_scene)
+        .add_startup_system(load_gltf)
         .add_system(cube_rotator_system)
         .add_system(rotator_system)
         .run();
@@ -33,11 +33,15 @@ struct FirstPassCube;
 struct MainPassCube;
 
 #[derive(Resource)]
-struct ToSpawn(Handle<Scene>);
+struct ToSpawn {
+    mesh: Handle<Mesh>,
+    material: Handle<StandardMaterial>,
+}
 
-fn load_gltf_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let handle = asset_server.load("Fox.glb#Scene0");
-    commands.insert_resource(ToSpawn(handle));
+fn load_gltf(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let mesh = asset_server.load("Fox.glb#Mesh0/Primitive0");
+    let material = asset_server.load("Fox.glb#Material0");
+    commands.insert_resource(ToSpawn { mesh, material });
 }
 
 fn setup(
@@ -46,7 +50,6 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut images: ResMut<Assets<Image>>,
     to_spawn: Option<Res<ToSpawn>>,
-    scenes: Res<Assets<Scene>>,
 ) {
     let to_spawn = match to_spawn {
         Some(to_spawn) => to_spawn,
@@ -55,7 +58,7 @@ fn setup(
         }
     };
 
-    if !scenes.contains(&to_spawn.0) {
+    if !meshes.contains(&to_spawn.mesh) {
         return;
     }
 
@@ -87,21 +90,14 @@ fn setup(
 
     let image_handle = images.add(image);
 
-    let cube_handle = meshes.add(Mesh::from(shape::Cube { size: 4.0 }));
-    let cube_material_handle = materials.add(StandardMaterial {
-        base_color: Color::rgb(0.8, 0.7, 0.6),
-        reflectance: 0.02,
-        unlit: false,
-        ..default()
-    });
-
     // This specifies the layer used for the first pass, which will be attached to the first pass camera and cube.
     let first_pass_layer = RenderLayers::layer(1);
 
     // The model that will be rendered to the texture.
     commands.spawn((
-        SceneBundle {
-            scene: to_spawn.0.clone(),
+        PbrBundle {
+            mesh: to_spawn.mesh.clone(),
+            material: to_spawn.material.clone(),
             transform: Transform::from_translation(Vec3::new(0.0, 0.0, 1.0)),
             ..default()
         },
