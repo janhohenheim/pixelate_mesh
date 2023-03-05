@@ -30,6 +30,7 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     to_spawn: Option<Res<ToSpawn>>,
+    scenes: Res<Assets<Scene>>,
 ) {
     let fox_handle = match to_spawn {
         Some(to_spawn) => to_spawn.fox.clone(),
@@ -37,6 +38,10 @@ fn setup(
             return;
         }
     };
+    if !scenes.contains(&fox_handle) {
+        return;
+    }
+
     commands.spawn((
         Name::new("Fox"),
         Pixelate {
