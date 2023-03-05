@@ -1,5 +1,5 @@
 use crate::util::get_max_radius;
-use crate::{Canvas, PixelationCamera};
+use crate::{Canvas, Pixelate, PixelationCamera};
 use bevy::{prelude::*, render::primitives::Aabb};
 
 /// Syncs the pixelation camera to the main camera.
@@ -52,6 +52,26 @@ pub(crate) fn position_canvas<T: Component>(
             }
         } else {
             commands.entity(canvas.target).despawn_recursive();
+        }
+    }
+}
+
+pub(crate) fn despawn_dependent_types(
+    mut commands: Commands,
+    removed_pixelate: RemovedComponents<Pixelate>,
+    canvas_query: Query<Entity, With<Canvas>>,
+    pixelation_camera_query: Query<Entity, With<PixelationCamera>>,
+) {
+    for entity in removed_pixelate.iter() {
+        for canvas in canvas_query.iter() {
+            if canvas == entity {
+                commands.entity(canvas).despawn_recursive();
+            }
+        }
+        for pixelation_camera in pixelation_camera_query.iter() {
+            if pixelation_camera == entity {
+                commands.entity(pixelation_camera).despawn_recursive();
+            }
         }
     }
 }

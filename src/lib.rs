@@ -1,10 +1,7 @@
 #![forbid(missing_docs)]
 //! This crate provides a plugin for pixelating meshes.
 
-use bevy::{
-    prelude::*,
-};
-
+use bevy::prelude::*;
 
 /// Everything you need to get started
 pub mod prelude {
@@ -37,6 +34,7 @@ where
         app.register_type::<Pixelate>()
             .add_system(runtime::position_canvas::<C>)
             .add_system(runtime::sync_cameras::<C>)
+            .add_system(runtime::despawn_dependent_types)
             .add_system(creation::add_pixelation);
     }
 }
