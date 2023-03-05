@@ -58,7 +58,7 @@ pub(crate) fn position_canvas<T: Component>(
 
 pub(crate) fn despawn_dependent_types(
     mut commands: Commands,
-    removed_pixelate: RemovedComponents<Pixelate>,
+    mut removed_pixelate: RemovedComponents<Pixelate>,
     canvas_query: Query<Entity, With<Canvas>>,
     pixelation_camera_query: Query<Entity, With<PixelationCamera>>,
 ) {
