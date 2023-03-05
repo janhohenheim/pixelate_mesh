@@ -4,6 +4,7 @@ use std::f32::consts::PI;
 
 use bevy::{
     core_pipeline::clear_color::ClearColorConfig,
+    gltf::{Gltf, GltfMesh},
     prelude::*,
     render::{
         camera::RenderTarget,
@@ -21,6 +22,7 @@ fn main() {
         .add_startup_system(load_gltf)
         .add_system(cube_rotator_system)
         .add_system(rotator_system)
+        .add_system(on_spawn.before(setup))
         .run();
 }
 
@@ -33,20 +35,17 @@ struct FirstPassCube;
 struct MainPassCube;
 
 #[derive(Resource)]
-struct ToSpawn {
-    mesh: Handle<Mesh>,
-    material: Handle<StandardMaterial>,
-}
+struct ToSpawn(Handle<Gltf>);
 
 fn load_gltf(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let mesh = asset_server.load("Fox.glb#Mesh0/Primitive0");
-    let material = asset_server.load("Fox.glb#Material0");
-    commands.insert_resource(ToSpawn { mesh, material });
+    let gltf = asset_server.load("Fox.glb");
+    commands.insert_resource(ToSpawn(gltf));
 }
 
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
+    gltfs: Res<Assets<Gltf>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut images: ResMut<Assets<Image>>,
     to_spawn: Option<Res<ToSpawn>>,
@@ -58,9 +57,12 @@ fn setup(
         }
     };
 
-    if !meshes.contains(&to_spawn.mesh) {
-        return;
-    }
+    let gltf = match gltfs.get(&to_spawn.0) {
+        Some(gltf) => gltf,
+        None => {
+            return;
+        }
+    };
 
     let size = Extent3d {
         width: 512,
@@ -95,10 +97,8 @@ fn setup(
 
     // The model that will be rendered to the texture.
     commands.spawn((
-        PbrBundle {
-            mesh: to_spawn.mesh.clone(),
-            material: to_spawn.material.clone(),
-            transform: Transform::from_translation(Vec3::new(0.0, 0.0, 1.0)),
+        SceneBundle {
+            scene: gltf.scenes[0].clone(),
             ..default()
         },
         FirstPassCube,
@@ -176,5 +176,32 @@ fn cube_rotator_system(time: Res<Time>, mut query: Query<&mut Transform, With<Ma
     for mut transform in &mut query {
         transform.rotate_x(1.0 * time.delta_seconds());
         transform.rotate_y(0.7 * time.delta_seconds());
+    }
+}
+
+fn on_spawn(
+    mut commands: Commands,
+    assets_gltf: Res<Assets<Gltf>>,
+    assets_gltfmesh: Res<Assets<GltfMesh>>,
+    my_loaded_gltf: Option<Res<ToSpawn>>,
+    q: Query<(Entity, &Handle<Mesh>)>,
+) {
+    let my_loaded_gltf = match my_loaded_gltf {
+        Some(my_loaded_gltf) => my_loaded_gltf,
+        None => {
+            return;
+        }
+    };
+    if let Some(gltf) = assets_gltf.get(&my_loaded_gltf.0) {
+        for mesh in gltf.meshes.iter() {
+            let gltf_mesh = assets_gltfmesh.get(&mesh).unwrap();
+            for primitive in gltf_mesh.primitives.iter() {
+                for (e, h) in q.iter() {
+                    if *h == primitive.mesh {
+                        commands.entity(e).insert(RenderLayers::layer(1));
+                    }
+                }
+            }
+        }
     }
 }

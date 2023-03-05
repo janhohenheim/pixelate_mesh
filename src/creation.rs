@@ -14,6 +14,7 @@ use bevy::{
     utils::{HashMap, HashSet},
 };
 use std::f32::consts::PI;
+use std::iter;
 
 #[derive(Debug, Resource, Reflect, Default, Deref, DerefMut)]
 #[reflect(Resource)]
@@ -40,15 +41,13 @@ pub(crate) fn add_pixelation(
 ) {
     let mut ready = HashMap::new();
     for entity in to_pixelate.iter().copied() {
-        let (_pixelate, mesh_handle) = pixelate_query.get(entity).unwrap();
-        if let Some(mesh_handle) = mesh_handle.or_else(|| {
-            children
-                .iter_descendants(entity)
-                .filter_map(|child| mesh_handles.get(child).ok())
-                .next()
-        }) {
-            if meshes.contains(mesh_handle) {
-                ready.insert(entity, mesh_handle);
+        let self_and_descendants = iter::once(entity).chain(children.iter_descendants(entity));
+        for entity in self_and_descendants {
+            commands.entity(entity).insert(RenderLayers::layer(1));
+            if let Ok(mesh_handle) = mesh_handles.get(entity) {
+                if meshes.contains(mesh_handle) {
+                    ready.insert(entity, mesh_handle);
+                }
             }
         }
     }
