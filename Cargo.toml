@@ -13,3 +13,6 @@ features = [
     "bevy_asset",
     "render",
 ]
+
+[dev-dependencies]
+bevy = "0.9.1"

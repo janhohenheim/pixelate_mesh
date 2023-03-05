@@ -15,9 +15,23 @@ use bevy::{
 };
 use std::f32::consts::PI;
 
+/// Everything you need to get started
+pub mod prelude {
+    pub use crate::{Pixelate, PixelateMeshPlugin};
+}
+
 /// The plugin type for this crate.
+#[derive(Debug)]
 pub struct PixelateMeshPlugin<C: Component> {
     _camera_type: std::marker::PhantomData<C>,
+}
+
+impl<C: Component> Default for PixelateMeshPlugin<C> {
+    fn default() -> Self {
+        Self {
+            _camera_type: std::marker::PhantomData,
+        }
+    }
 }
 
 impl<C> Plugin for PixelateMeshPlugin<C>
