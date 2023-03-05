@@ -47,7 +47,9 @@ pub(crate) fn add_pixelation(
                 .filter_map(|child| mesh_handles.get(child).ok())
                 .next()
         }) {
-            ready.insert(entity, mesh_handle);
+            if meshes.contains(mesh_handle) {
+                ready.insert(entity, mesh_handle);
+            }
         }
     }
     to_pixelate.0 = to_pixelate

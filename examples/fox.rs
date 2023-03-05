@@ -26,8 +26,9 @@ fn setup(
             horizontal_pixels: 64,
             vertical_pixels: 64,
         },
-        SceneBundle {
-            scene: asset_server.load("Fox.glb#Scene0"),
+        PbrBundle {
+            mesh: asset_server.load("Fox.glb#Mesh0/Primitive0"),
+            material: asset_server.load("Fox.glb#Material0"),
             ..default()
         },
     ));
