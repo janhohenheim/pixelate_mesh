@@ -7,41 +7,19 @@ fn main() {
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .insert_resource(Msaa { samples: 1 })
         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
-        .add_startup_system(load_gltf)
-        .add_system(setup)
+        .add_startup_system(setup)
         .run();
 }
 
 #[derive(Component)]
 struct MainCamera;
 
-#[derive(Resource)]
-struct ToSpawn {
-    fox: Handle<Scene>,
-}
-
-fn load_gltf(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let handle = asset_server.load("Fox.glb#Scene0");
-    commands.insert_resource(ToSpawn { fox: handle });
-}
-
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    to_spawn: Option<Res<ToSpawn>>,
-    scenes: Res<Assets<Scene>>,
+    asset_server: Res<AssetServer>,
 ) {
-    let fox_handle = match to_spawn {
-        Some(to_spawn) => to_spawn.fox.clone(),
-        None => {
-            return;
-        }
-    };
-    if !scenes.contains(&fox_handle) {
-        return;
-    }
-
     commands.spawn((
         Name::new("Fox"),
         Pixelate {
@@ -49,7 +27,7 @@ fn setup(
             vertical_pixels: 64,
         },
         SceneBundle {
-            scene: fox_handle,
+            scene: asset_server.load("Fox.glb#Scene0"),
             ..default()
         },
     ));
@@ -89,6 +67,4 @@ fn setup(
             ..default()
         },
     ));
-
-    commands.remove_resource::<ToSpawn>();
 }

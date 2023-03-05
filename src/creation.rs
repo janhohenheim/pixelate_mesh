@@ -11,29 +11,53 @@ use bevy::{
         },
         view::RenderLayers,
     },
+    utils::{HashMap, HashSet},
 };
 use std::f32::consts::PI;
+
+#[derive(Debug, Resource, Reflect, Default, Deref, DerefMut)]
+#[reflect(Resource)]
+pub(crate) struct ToPixelate(HashSet<Entity>);
+
+pub(crate) fn mark_for_pixelation(
+    mut pixelate_query: Query<Entity, Added<Pixelate>>,
+    mut to_pixelate: ResMut<ToPixelate>,
+) {
+    for entity in &mut pixelate_query {
+        to_pixelate.0.insert(entity);
+    }
+}
 
 pub(crate) fn add_pixelation(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut images: ResMut<Assets<Image>>,
-    added_pixelate: Query<(Entity, &Pixelate, Option<&Handle<Mesh>>), Added<Pixelate>>,
+    pixelate_query: Query<(&Pixelate, Option<&Handle<Mesh>>)>,
     mesh_handles: Query<&Handle<Mesh>>,
     children: Query<&Children>,
+    mut to_pixelate: ResMut<ToPixelate>,
 ) {
-    for (entity, pixelate, mesh_handle) in &added_pixelate {
+    let mut ready = HashMap::new();
+    for entity in to_pixelate.iter().copied() {
+        let (_pixelate, mesh_handle) = pixelate_query.get(entity).unwrap();
+        if let Some(mesh_handle) = mesh_handle.or_else(|| {
+            children
+                .iter_descendants(entity)
+                .filter_map(|child| mesh_handles.get(child).ok())
+                .next()
+        }) {
+            ready.insert(entity, mesh_handle);
+        }
+    }
+    to_pixelate.0 = to_pixelate
+        .difference(&ready.keys().copied().collect())
+        .copied()
+        .collect();
+    for (entity, mesh_handle) in ready.drain() {
+        let (pixelate, _mesh_handle) = pixelate_query.get(entity).unwrap();
         // This specifies the layer used for the first pass, which will be attached to the first pass camera and cube.
         let first_pass_layer = RenderLayers::layer(1);
-        let mesh_handle = mesh_handle
-            .or_else(|| {
-                children
-                    .iter_descendants(entity)
-                    .filter_map(|child| mesh_handles.get(child).ok())
-                    .next()
-            })
-            .expect("Type with Pixelate component must have a mesh or a child with a mesh");
 
         let image = create_image(*pixelate);
         let image_handle = images.add(image);

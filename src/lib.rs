@@ -32,10 +32,12 @@ where
 {
     fn build(&self, app: &mut App) {
         app.register_type::<Pixelate>()
+            .init_resource::<creation::ToPixelate>()
             .add_system(runtime::position_canvas::<C>)
             .add_system(runtime::sync_cameras::<C>)
             .add_system(runtime::despawn_dependent_types)
-            .add_system(creation::add_pixelation);
+            .add_system(creation::add_pixelation)
+            .add_system(creation::mark_for_pixelation);
     }
 }
 
