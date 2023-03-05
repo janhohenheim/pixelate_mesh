@@ -42,8 +42,7 @@ where
         app.register_type::<Pixelate>()
             .add_system(position_canvas::<C>)
             .add_system(sync_cameras::<C>)
-            .add_system(add_pixelation)
-            .run();
+            .add_system(add_pixelation);
     }
 }
 
