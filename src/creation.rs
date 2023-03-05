@@ -19,11 +19,21 @@ pub(crate) fn add_pixelation(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut images: ResMut<Assets<Image>>,
-    pixelation_query: Query<(Entity, &Pixelate, &Handle<Mesh>), Added<Pixelate>>,
+    added_pixelate: Query<(Entity, &Pixelate, Option<&Handle<Mesh>>), Added<Pixelate>>,
+    mesh_handles: Query<&Handle<Mesh>>,
+    children: Query<&Children>,
 ) {
-    for (entity, pixelate, mesh_handle) in &pixelation_query {
+    for (entity, pixelate, mesh_handle) in &added_pixelate {
         // This specifies the layer used for the first pass, which will be attached to the first pass camera and cube.
         let first_pass_layer = RenderLayers::layer(1);
+        let mesh_handle = mesh_handle
+            .or_else(|| {
+                children
+                    .iter_descendants(entity)
+                    .filter_map(|child| mesh_handles.get(child).ok())
+                    .next()
+            })
+            .expect("Type with Pixelate component must have a mesh or a child with a mesh");
 
         let image = create_image(*pixelate);
         let image_handle = images.add(image);
