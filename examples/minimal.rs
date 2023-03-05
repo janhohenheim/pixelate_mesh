@@ -4,7 +4,7 @@ use pixelate_mesh::prelude::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
-        .insert_resource(Msaa { samples: 1 })
+        .insert_resource(Msaa::Off)
         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
         .add_startup_system(setup)
         .run();
