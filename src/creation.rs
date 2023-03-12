@@ -89,26 +89,6 @@ pub(crate) fn add_pixelation(
                         },
                     ));
                 });
-            /*
-            commands
-                .entity(entity)
-                .insert((first_pass_layer, aabb, image_handle.clone()))
-                .with_children(|parent| {
-                    // The shadow of the cube
-                    parent.spawn((
-                        Name::new("Shadow object"),
-                        PbrBundle {
-                            mesh: mesh_handle.clone(),
-                            material: materials.add(StandardMaterial {
-                                base_color: Color::NONE,
-                                alpha_mode: AlphaMode::Mask(1.),
-                                ..default()
-                            }),
-                            ..default()
-                        },
-                    ));
-                });
-             */
         }
     }
 }

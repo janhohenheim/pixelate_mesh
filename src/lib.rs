@@ -59,6 +59,16 @@ pub struct Pixelate {
     pub vertical_pixels: u32,
 }
 
+impl Pixelate {
+    /// Creates a new `Pixelate` component with the given dimensions.
+    pub fn splat(horizontal_and_vertical_pixels: u32) -> Self {
+        Self {
+            horizontal_pixels: horizontal_and_vertical_pixels,
+            vertical_pixels: horizontal_and_vertical_pixels,
+        }
+    }
+}
+
 // Marks the main pass cube, to which the texture is applied.
 #[derive(Debug, Component, Copy, Clone)]
 struct Canvas {
