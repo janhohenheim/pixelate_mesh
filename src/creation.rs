@@ -15,7 +15,6 @@ use bevy::{
     utils::HashSet,
 };
 use std::f32::consts::PI;
-use std::iter;
 
 #[derive(Debug, Resource, Reflect, Default, Deref, DerefMut)]
 #[reflect(Resource)]
@@ -44,7 +43,6 @@ pub(crate) fn add_pixelation(
         Option<&SceneInstance>,
     )>,
     mesh_handles: Query<&Handle<Mesh>>,
-    children: Query<&Children>,
     mut to_pixelate: ResMut<ToPixelate>,
 ) {
     // This specifies the layer used for the first pass, which will be attached to the first pass camera and cube.
@@ -70,31 +68,21 @@ pub(crate) fn add_pixelation(
                 ready.insert(entity);
             }
         } else {
-            debug!(
-                "Pixelating an entity without a mesh or scene, let's assume this is a hierarchy"
-            );
-            ready.insert(entity);
+            panic!("The Pixelate component can only be added to entities with a Mesh or a Scene, but found neither.");
         }
     }
 
     to_pixelate.0 = to_pixelate.difference(&ready).copied().collect();
     for entity in ready.drain() {
-        let mut hierarchy = iter::once(entity)
-            .chain(children.iter_descendants(entity))
-            .filter_map(|entity| {
-                mesh_handles
-                    .get(entity)
-                    .ok()
-                    .map(|mesh_handle| (entity, mesh_handle))
-            });
-        let (canvas_entity, canvas_mesh_handle) = hierarchy.next().expect("No mesh found in pixelation hierarchy. All entities with a Pixelate component must contain a mesh, or have a child with a mesh.");
+        let mesh_handle = mesh_handles.get(entity).unwrap();
         debug!("Spawning canvas");
-        let mesh = meshes.get(&canvas_mesh_handle).unwrap();
+        let mesh = meshes.get(&mesh_handle).unwrap();
         let aabb = mesh.compute_aabb().unwrap();
         let plane_handle = meshes.add(create_canvas_mesh(&aabb));
         let pixelate = pixelate_query.get(entity).unwrap().0;
         let image = create_image(*pixelate);
         let image_handle = images.add(image);
+        commands.entity(entity).insert(first_pass_layer);
         commands.spawn((
             Name::new("Pixelation Camera"),
             Camera3dBundle {
@@ -110,18 +98,14 @@ pub(crate) fn add_pixelation(
                 },
                 ..default()
             },
-            PixelationCamera {
-                target: canvas_entity,
-            },
+            PixelationCamera { target: entity },
             first_pass_layer,
         ));
 
         commands
             .spawn((
                 Name::new("Canvas"),
-                Canvas {
-                    target: canvas_entity,
-                },
+                Canvas { target: entity },
                 SpatialBundle::default(),
             ))
             .with_children(|parent| {
@@ -160,10 +144,6 @@ pub(crate) fn add_pixelation(
                 ));
             });
          */
-        for (entity, _mesh_handle) in hierarchy {
-            debug!("Pixelating a child of the canvas");
-            commands.entity(entity).insert(first_pass_layer);
-        }
     }
 }
 

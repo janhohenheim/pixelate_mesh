@@ -1,9 +1,17 @@
+use bevy::log::{Level, LogPlugin};
 use bevy::prelude::*;
 use pixelate_mesh::prelude::*;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins(
+            DefaultPlugins
+                .set(ImagePlugin::default_nearest())
+                .set(LogPlugin {
+                    level: Level::DEBUG,
+                    filter: "bevy=info,wgpu=error,naga=warn,pixelate_mesh=debug".to_string(),
+                }),
+        )
         .insert_resource(Msaa::Off)
         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
         .add_startup_system(setup)
