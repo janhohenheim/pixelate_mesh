@@ -7,7 +7,6 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugin(EditorPlugin)
-        .insert_resource(Msaa::Off)
         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
         .add_startup_system(setup)
         .run();

@@ -1,11 +1,12 @@
 use bevy::{input::mouse::MouseMotion, prelude::*};
+use bevy_editor_pls::EditorPlugin;
 use pixelate_mesh::prelude::*;
 use std::f32::consts::PI;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
-        .insert_resource(Msaa::Off)
+        .add_plugin(EditorPlugin)
         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
         .add_startup_system(setup)
         .add_system(move_camera)
@@ -43,8 +44,7 @@ fn setup(
         Name::new("Camera"),
         MainCamera,
         Camera3dBundle {
-            transform: Transform::from_xyz(100.0, 100.0, 150.0)
-                .looking_at(Vec3::new(0.0, 20.0, 0.0), Vec3::Y),
+            transform: Transform::from_xyz(0.0, 150.0, 300.0),
             ..default()
         },
     ));
@@ -79,6 +79,7 @@ fn move_camera(
     let motion = total_motion * sensitivity * dt;
     let pitch = Quat::from_axis_angle(camera_transform.right(), -motion.y);
     let yaw = Quat::from_rotation_y(-motion.x);
-    camera_transform.rotate_around(Vec3::ZERO, pitch * yaw);
-    camera_transform.look_at(Vec3::ZERO, Vec3::Y);
+    let target = Vec3::Y * 50.0;
+    camera_transform.rotate_around(target, pitch * yaw);
+    camera_transform.look_at(target, Vec3::Y);
 }

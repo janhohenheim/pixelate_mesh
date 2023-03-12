@@ -36,6 +36,7 @@ where
         app.register_type::<Pixelate>()
             .init_resource::<ready_checks::ToPixelate>()
             .init_resource::<creation::Ordering>()
+            .insert_resource(Msaa::Off)
             .add_event::<ready_checks::PixelationTargetReadyEvent>()
             .add_systems((
                 ready_checks::get_ready_pixelation_targets,
@@ -69,7 +70,7 @@ impl Pixelate {
     }
 }
 
-// Marks the main pass cube, to which the texture is applied.
+/// Marks the main pass plane, to which the texture is applied.
 #[derive(Debug, Component, Copy, Clone)]
 struct Canvas {
     pub(crate) target: Entity,
