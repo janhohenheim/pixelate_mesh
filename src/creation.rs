@@ -1,5 +1,6 @@
 use crate::util::get_max_radius;
 use crate::{Canvas, Pixelate, PixelationCamera};
+use bevy::utils::HashMap;
 use bevy::{
     core_pipeline::clear_color::ClearColorConfig,
     prelude::*,
@@ -35,51 +36,17 @@ pub(crate) fn add_pixelation(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut images: ResMut<Assets<Image>>,
-    scene_spawner: Res<SceneSpawner>,
-    pixelate_query: Query<(
-        &Pixelate,
-        Option<&Handle<Mesh>>,
-        Option<&Handle<Scene>>,
-        Option<&SceneInstance>,
-    )>,
-    mesh_handles: Query<&Handle<Mesh>>,
-    mut to_pixelate: ResMut<ToPixelate>,
+    pixelate_query: Query<&Pixelate>,
+    In(pixelation_targets): In<HashMap<Entity, Handle<Mesh>>>,
 ) {
     // This specifies the layer used for the first pass, which will be attached to the first pass camera and cube.
     let first_pass_layer = RenderLayers::layer(1);
-
-    let mut ready = HashSet::new();
-    for entity in to_pixelate.iter().copied() {
-        let (_pixelate, mesh_handle, scene_handle, scene_instance) =
-            pixelate_query.get(entity).unwrap();
-        if scene_handle.is_some() {
-            debug!("Pixelating a scene; waiting for it to load...");
-            if let Some(scene_instance) = scene_instance {
-                debug!("The scene is loaded, waiting for it to be ready...");
-                if scene_spawner.instance_is_ready(**scene_instance) {
-                    debug!("The scene is ready!");
-                    ready.insert(entity);
-                }
-            }
-        } else if let Some(mesh_handle) = mesh_handle {
-            debug!("Pixelating a mesh; waiting for it to load...");
-            if meshes.contains(mesh_handle) {
-                debug!("The mesh is loaded!");
-                ready.insert(entity);
-            }
-        } else {
-            panic!("The Pixelate component can only be added to entities with a Mesh or a Scene, but found neither.");
-        }
-    }
-
-    to_pixelate.0 = to_pixelate.difference(&ready).copied().collect();
-    for entity in ready.drain() {
-        let mesh_handle = mesh_handles.get(entity).unwrap();
+    for (&entity, mesh_handle) in pixelation_targets.iter() {
         debug!("Spawning canvas");
-        let mesh = meshes.get(&mesh_handle).unwrap();
+        let mesh = meshes.get(mesh_handle).unwrap();
         let aabb = mesh.compute_aabb().unwrap();
         let plane_handle = meshes.add(create_canvas_mesh(&aabb));
-        let pixelate = pixelate_query.get(entity).unwrap().0;
+        let pixelate = pixelate_query.get(entity).unwrap();
         let image = create_image(*pixelate);
         let image_handle = images.add(image);
         commands.entity(entity).insert(first_pass_layer);
@@ -145,6 +112,54 @@ pub(crate) fn add_pixelation(
             });
          */
     }
+}
+
+pub(crate) fn get_ready_pixelation_targets(
+    mut to_pixelate: ResMut<ToPixelate>,
+    pixelate_query: Query<
+        (
+            Option<&Handle<Mesh>>,
+            Option<&Handle<Scene>>,
+            Option<&SceneInstance>,
+        ),
+        With<Pixelate>,
+    >,
+    mesh_handles: Query<&Handle<Mesh>>,
+    meshes: Res<Assets<Mesh>>,
+    scene_spawner: Res<SceneSpawner>,
+) -> HashMap<Entity, Handle<Mesh>> {
+    let mut pixelation_targets = HashMap::new();
+    for &entity in to_pixelate.iter() {
+        let (mesh_handle, scene_handle, scene_instance) = pixelate_query.get(entity).unwrap();
+        if scene_handle.is_some() {
+            debug!("Pixelating a scene; waiting for it to load...");
+            if let Some(scene_instance) = scene_instance {
+                debug!("The scene is loaded, waiting for it to be ready...");
+                let scene_instance = **scene_instance;
+                if scene_spawner.instance_is_ready(scene_instance) {
+                    let mesh_handle = scene_spawner
+                        .iter_instance_entities(scene_instance)
+                        .filter_map(|entity| mesh_handles.get(entity).ok())
+                        .next()
+                        .unwrap();
+
+                    debug!("The scene is ready!");
+                    pixelation_targets.insert(entity, mesh_handle.clone());
+                }
+            }
+        } else if let Some(mesh_handle) = mesh_handle {
+            debug!("Pixelating a mesh; waiting for it to load...");
+            if meshes.contains(mesh_handle) {
+                debug!("The mesh is loaded!");
+                pixelation_targets.insert(entity, mesh_handle.clone());
+            }
+        } else {
+            panic!("The Pixelate component can only be added to entities with a Mesh or a Scene, but found neither.");
+        }
+    }
+    let ready = pixelation_targets.keys().copied().collect();
+    to_pixelate.0 = to_pixelate.difference(&ready).copied().collect();
+    pixelation_targets
 }
 
 fn create_canvas_mesh(aabb: &Aabb) -> Mesh {
