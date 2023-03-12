@@ -9,6 +9,7 @@ pub mod prelude {
 }
 
 mod creation;
+mod ready_checks;
 mod runtime;
 mod util;
 
@@ -32,12 +33,16 @@ where
 {
     fn build(&self, app: &mut App) {
         app.register_type::<Pixelate>()
-            .init_resource::<creation::ToPixelate>()
-            .add_system(runtime::position_canvas::<C>)
-            .add_system(runtime::sync_cameras::<C>)
-            .add_system(runtime::despawn_dependent_types)
-            .add_system(creation::get_ready_pixelation_targets.pipe(creation::add_pixelation))
-            .add_system(creation::mark_for_pixelation);
+            .init_resource::<ready_checks::ToPixelate>()
+            .add_event::<ready_checks::PixelationTargetReadyEvent>()
+            .add_systems((
+                ready_checks::get_ready_pixelation_targets,
+                ready_checks::mark_for_pixelation,
+                creation::add_pixelation,
+                runtime::position_canvas::<C>,
+                runtime::sync_cameras::<C>,
+                runtime::despawn_dependent_types,
+            ));
     }
 }
 

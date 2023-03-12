@@ -5,11 +5,12 @@ use bevy::{prelude::*, render::primitives::Aabb};
 /// Syncs the pixelation camera to the main camera.
 pub(crate) fn sync_cameras<T: Component>(
     mut commands: Commands,
-    mut pixelation_camera_query: Query<(&mut Transform, &PixelationCamera), Without<T>>,
+    mut pixelation_camera_query: Query<(Entity, &mut Transform, &PixelationCamera), Without<T>>,
     outer_camera_query: Query<&Transform, (With<T>, Without<PixelationCamera>)>,
     main_object_query: Query<(&Transform, &Aabb), (Without<T>, Without<PixelationCamera>)>,
 ) {
-    for (mut pixelation_camera_transform, pixelation_camera) in &mut pixelation_camera_query {
+    for (entity, mut pixelation_camera_transform, pixelation_camera) in &mut pixelation_camera_query
+    {
         for outer_camera_transform in outer_camera_query.iter() {
             if let Ok((main_object_transform, aabb)) =
                 main_object_query.get(pixelation_camera.target)
@@ -26,9 +27,11 @@ pub(crate) fn sync_cameras<T: Component>(
                 const DISTANCE_FACTOR: f32 = 3.2;
                 pixelation_camera_transform.translation += back * radius * DISTANCE_FACTOR;
             } else {
-                commands
-                    .entity(pixelation_camera.target)
-                    .despawn_recursive();
+                debug!("Despawning pixelation camera because it holds an invalid target.");
+                commands.entity(entity).despawn_recursive();
+                if let Some(entity_commands) = commands.get_entity(pixelation_camera.target) {
+                    entity_commands.despawn_recursive();
+                }
             }
         }
     }
@@ -37,11 +40,11 @@ pub(crate) fn sync_cameras<T: Component>(
 /// Rotates the canvas (main pass)
 pub(crate) fn position_canvas<T: Component>(
     mut commands: Commands,
-    mut canvas_query: Query<(&mut Transform, &Canvas), Without<T>>,
+    mut canvas_query: Query<(Entity, &mut Transform, &Canvas), Without<T>>,
     outer_camera_query: Query<&Transform, (With<T>, Without<Canvas>)>,
     main_object_query: Query<(&Transform, &Aabb), (Without<T>, Without<Canvas>)>,
 ) {
-    for (mut canvas_transform, canvas) in &mut canvas_query {
+    for (entity, mut canvas_transform, canvas) in &mut canvas_query {
         if let Ok((main_object_transform, aabb)) = main_object_query.get(canvas.target) {
             for camera_transform in outer_camera_query.iter() {
                 *canvas_transform = main_object_transform
@@ -51,7 +54,11 @@ pub(crate) fn position_canvas<T: Component>(
                 canvas_transform.translation += forward * radius;
             }
         } else {
-            commands.entity(canvas.target).despawn_recursive();
+            debug!("Despawning canvas because it holds an invalid target.");
+            commands.entity(entity).despawn_recursive();
+            if let Some(entity_commands) = commands.get_entity(canvas.target) {
+                entity_commands.despawn_recursive();
+            }
         }
     }
 }
@@ -63,6 +70,7 @@ pub(crate) fn despawn_dependent_types(
     pixelation_camera_query: Query<Entity, With<PixelationCamera>>,
 ) {
     for entity in removed_pixelate.iter() {
+        debug!("Pixelate was removed from an entity; removing canvas and pixelation camera that held it as target.");
         for canvas in canvas_query.iter() {
             if canvas == entity {
                 commands.entity(canvas).despawn_recursive();
