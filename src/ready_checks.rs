@@ -17,8 +17,20 @@ pub(crate) fn mark_for_pixelation(
     }
 }
 
-#[derive(Debug, Reflect, Default, Deref, DerefMut)]
-pub(crate) struct PixelationTargetReadyEvent(HashMap<Entity, Handle<Mesh>>);
+#[derive(Debug, Default, Deref, DerefMut)]
+pub(crate) struct PixelationTargetReadyEvent(HashMap<Entity, PixelationTarget>);
+
+#[derive(Debug, Clone)]
+pub(crate) struct PixelationTarget {
+    pub(crate) mesh_handle: Handle<Mesh>,
+    pub(crate) kind: PixelationTargetKind,
+}
+
+#[derive(Debug, Clone)]
+pub(crate) enum PixelationTargetKind {
+    Mesh,
+    Scene,
+}
 
 pub(crate) fn get_ready_pixelation_targets(
     mut to_pixelate: ResMut<ToPixelate>,
@@ -51,14 +63,26 @@ pub(crate) fn get_ready_pixelation_targets(
                         .unwrap();
 
                     debug!("The scene is ready!");
-                    pixelation_targets.insert(entity, mesh_handle.clone());
+                    pixelation_targets.insert(
+                        entity,
+                        PixelationTarget {
+                            mesh_handle: mesh_handle.clone(),
+                            kind: PixelationTargetKind::Scene,
+                        },
+                    );
                 }
             }
         } else if let Some(mesh_handle) = mesh_handle {
             debug!("Pixelating a mesh; waiting for it to load...");
             if meshes.contains(mesh_handle) {
                 debug!("The mesh is loaded!");
-                pixelation_targets.insert(entity, mesh_handle.clone());
+                pixelation_targets.insert(
+                    entity,
+                    PixelationTarget {
+                        mesh_handle: mesh_handle.clone(),
+                        kind: PixelationTargetKind::Mesh,
+                    },
+                );
             }
         } else {
             panic!("The Pixelate component can only be added to entities with a Mesh or a Scene, but found neither.");

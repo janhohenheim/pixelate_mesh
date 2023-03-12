@@ -15,6 +15,18 @@ use bevy::{
 };
 use std::f32::consts::PI;
 
+#[derive(Debug, Resource, Clone, Default)]
+pub(crate) struct Ordering {
+    pub(crate) last_order: isize,
+}
+impl Ordering {
+    pub(crate) fn next(&mut self) -> isize {
+        // render before the "main pass" camera
+        self.last_order -= 1;
+        self.last_order
+    }
+}
+
 pub(crate) fn add_pixelation(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -22,13 +34,14 @@ pub(crate) fn add_pixelation(
     mut images: ResMut<Assets<Image>>,
     pixelate_query: Query<&Pixelate>,
     mut pixelation_target_ready_reader: EventReader<PixelationTargetReadyEvent>,
+    mut ordering: ResMut<Ordering>,
 ) {
     // This specifies the layer used for the first pass, which will be attached to the first pass camera and cube.
     let first_pass_layer = RenderLayers::layer(1);
     for event in pixelation_target_ready_reader.iter() {
-        for (&entity, mesh_handle) in event.iter() {
+        for (&entity, target) in event.iter() {
             debug!("Spawning canvas");
-            let mesh = meshes.get(mesh_handle).unwrap();
+            let mesh = meshes.get(&target.mesh_handle).unwrap();
             let aabb = mesh.compute_aabb().unwrap();
             let plane_handle = meshes.add(create_canvas_mesh(&aabb));
             let pixelate = pixelate_query.get(entity).unwrap();
@@ -45,8 +58,7 @@ pub(crate) fn add_pixelation(
                         ..default()
                     },
                     camera: Camera {
-                        // render before the "main pass" camera
-                        order: -1,
+                        order: ordering.next(),
                         target: RenderTarget::Image(image_handle.clone()),
                         ..default()
                     },

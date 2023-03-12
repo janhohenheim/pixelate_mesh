@@ -10,6 +10,7 @@ pub mod prelude {
 
 mod creation;
 mod ready_checks;
+mod recursive_layering;
 mod runtime;
 mod util;
 
@@ -34,6 +35,7 @@ where
     fn build(&self, app: &mut App) {
         app.register_type::<Pixelate>()
             .init_resource::<ready_checks::ToPixelate>()
+            .init_resource::<creation::Ordering>()
             .add_event::<ready_checks::PixelationTargetReadyEvent>()
             .add_systems((
                 ready_checks::get_ready_pixelation_targets,
