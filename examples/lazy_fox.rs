@@ -2,11 +2,13 @@ use bevy::gltf::Gltf;
 use bevy::gltf::GltfMesh;
 use bevy::prelude::*;
 use bevy::render::view::RenderLayers;
+use bevy_editor_pls::EditorPlugin;
 use pixelate_mesh::prelude::*;
 use std::f32::consts::PI;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugin(EditorPlugin)
         .insert_resource(Msaa::Off)
         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
         .add_startup_system(load_gltf)
@@ -92,6 +94,7 @@ fn setup(
             ..default()
         },
     ));
+    commands.remove_resource::<ToSpawn>();
 }
 
 fn on_spawn(

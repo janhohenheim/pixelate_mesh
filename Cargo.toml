@@ -10,6 +10,9 @@ edition = "2021"
 default = []
 bevy_dylib = ["bevy/bevy_dylib"]
 
+[dev-dependencies]
+bevy_editor_pls = "0.3.0"
+
 [dependencies.bevy]
 version = "0.10"
 default-features = false
