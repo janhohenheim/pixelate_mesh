@@ -8,7 +8,6 @@ use bevy::{
     prelude::*,
     render::{
         camera::RenderTarget,
-        primitives::Aabb,
         render_resource::{
             Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
         },
@@ -46,7 +45,6 @@ fn load_gltf(mut commands: Commands, asset_server: Res<AssetServer>) {
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    gltf_meshes: Res<Assets<GltfMesh>>,
     gltfs: Res<Assets<Gltf>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut images: ResMut<Assets<Image>>,
@@ -107,11 +105,6 @@ fn setup(
         first_pass_layer,
     ));
 
-    let gltf_mesh = gltf_meshes.get(&gltf.meshes[0]).unwrap();
-    let mesh = meshes.get(&gltf_mesh.primitives[0].mesh).unwrap();
-    let aabb = mesh.compute_aabb().unwrap();
-    let plane_handle = meshes.add(create_canvas_mesh(&aabb));
-
     // Light
     // NOTE: Currently lights are shared between passes - see https://github.com/bevyengine/bevy/issues/3462
     commands.spawn(PointLightBundle {
@@ -138,25 +131,28 @@ fn setup(
         first_pass_layer,
     ));
 
+    let cube_size = 4.0;
+    let cube_handle = meshes.add(Mesh::from(shape::Box::new(cube_size, cube_size, cube_size)));
+
+    // This material has the texture that has been rendered.
+    let material_handle = materials.add(StandardMaterial {
+        base_color_texture: Some(image_handle),
+        reflectance: 0.02,
+        unlit: false,
+        ..default()
+    });
+
     // Main pass cube, with material containing the rendered first pass texture.
-    commands
-        .spawn((Name::new("Canvas"), SpatialBundle::default()))
-        .with_children(|parent| {
-            parent.spawn((
-                Name::new("Canvas Mesh"),
-                PbrBundle {
-                    mesh: plane_handle,
-                    material: materials.add(StandardMaterial {
-                        base_color_texture: Some(image_handle.clone()),
-                        unlit: true,
-                        alpha_mode: AlphaMode::Blend,
-                        ..default()
-                    }),
-                    transform: Transform::from_rotation(Quat::from_rotation_y(PI)),
-                    ..default()
-                },
-            ));
-        });
+    commands.spawn((
+        PbrBundle {
+            mesh: cube_handle,
+            material: material_handle,
+            transform: Transform::from_xyz(0.0, 0.0, 1.5)
+                .with_rotation(Quat::from_rotation_x(-PI / 5.0)),
+            ..default()
+        },
+        MainPassCube,
+    ));
 
     // The main pass camera.
     commands.spawn(Camera3dBundle {
@@ -165,12 +161,6 @@ fn setup(
     });
 
     commands.remove_resource::<ToSpawn>();
-}
-
-fn create_canvas_mesh(aabb: &Aabb) -> Mesh {
-    let radius = get_max_radius(aabb);
-    let size = Vec2::splat(radius * 2.);
-    Mesh::from(shape::Quad { size, flip: false })
 }
 
 /// Rotates the inner cube (first pass)
@@ -214,8 +204,4 @@ fn on_spawn(
             }
         }
     }
-}
-
-pub(crate) fn get_max_radius(aabb: &Aabb) -> f32 {
-    aabb.half_extents.length()
 }
