@@ -6,13 +6,21 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = []
+bevy_dylib = ["bevy/bevy_dylib"]
+
 [dependencies.bevy]
-git = "https://github.com/bevyengine/bevy.git"
+version = "0.10"
 default-features = false
 features = [
     "bevy_asset",
+    "bevy_winit",
+    "x11",
     "bevy_render",
+    "bevy_core_pipeline",
+    "bevy_scene",
+    "bevy_pbr",
+    "bevy_gltf",
+    "png"
 ]
-
-[dev-dependencies]
-bevy = { git = "https://github.com/bevyengine/bevy.git" }
