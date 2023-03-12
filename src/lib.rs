@@ -41,6 +41,7 @@ where
                 ready_checks::get_ready_pixelation_targets,
                 ready_checks::mark_for_pixelation,
                 creation::add_pixelation,
+                recursive_layering::recursively_set_layer,
                 runtime::position_canvas::<C>,
                 runtime::sync_cameras::<C>,
                 runtime::despawn_dependent_types,

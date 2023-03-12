@@ -1,4 +1,3 @@
-use bevy::log::{Level, LogPlugin};
 use bevy::prelude::*;
 use bevy_editor_pls::EditorPlugin;
 use pixelate_mesh::prelude::*;
@@ -6,14 +5,7 @@ use std::f32::consts::PI;
 
 fn main() {
     App::new()
-        .add_plugins(
-            DefaultPlugins
-                .set(ImagePlugin::default_nearest())
-                .set(LogPlugin {
-                    level: Level::DEBUG,
-                    filter: "bevy=info,wgpu=error,naga=warn,pixelate_mesh=debug".to_string(),
-                }),
-        )
+        .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugin(EditorPlugin)
         .insert_resource(Msaa::Off)
         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())

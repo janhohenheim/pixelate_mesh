@@ -1,5 +1,5 @@
 use crate::ready_checks::PixelationTargetReadyEvent;
-use crate::util::get_max_radius;
+use crate::util::{get_max_radius, get_pixelation_render_layer};
 use crate::{Canvas, Pixelate, PixelationCamera};
 use bevy::{
     core_pipeline::clear_color::ClearColorConfig,
@@ -10,7 +10,6 @@ use bevy::{
         render_resource::{
             Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
         },
-        view::RenderLayers,
     },
 };
 use std::f32::consts::PI;
@@ -37,7 +36,7 @@ pub(crate) fn add_pixelation(
     mut ordering: ResMut<Ordering>,
 ) {
     // This specifies the layer used for the first pass, which will be attached to the first pass camera and cube.
-    let first_pass_layer = RenderLayers::layer(1);
+    let first_pass_layer = get_pixelation_render_layer();
     for event in pixelation_target_ready_reader.iter() {
         for (&entity, target) in event.iter() {
             debug!("Spawning canvas");
