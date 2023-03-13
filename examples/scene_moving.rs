@@ -8,6 +8,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(EditorPlugin)
         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
+        .add_system(move_pixelated)
         .add_startup_system(setup)
         .run();
 }
@@ -22,27 +23,10 @@ fn setup(
     asset_server: Res<AssetServer>,
 ) {
     commands.spawn((
-        Name::new("Fox high rez"),
-        SceneBundle {
-            scene: asset_server.load("Fox.glb#Scene0"),
-            transform: Transform::from_xyz(-50.0, 0.0, 0.0),
-            ..default()
-        },
-    ));
-    commands.spawn((
-        Name::new("Fox mid rez"),
-        Pixelate::splat(256),
-        SceneBundle {
-            scene: asset_server.load("Fox.glb#Scene0"),
-            ..default()
-        },
-    ));
-    commands.spawn((
-        Name::new("Fox low rez"),
+        Name::new("Fox"),
         Pixelate::splat(128),
         SceneBundle {
             scene: asset_server.load("Fox.glb#Scene0"),
-            transform: Transform::from_xyz(50.0, 0.0, 0.0),
             ..default()
         },
     ));
@@ -81,4 +65,15 @@ fn setup(
             ..default()
         },
     ));
+}
+
+fn move_pixelated(time: Res<Time>, mut pixelated: Query<&mut Transform, With<Pixelate>>) {
+    for mut transform in pixelated.iter_mut() {
+        let (sin, cos) = time.elapsed_seconds().sin_cos();
+        let sin = sin * sin * sin;
+        let cos = cos * cos * cos;
+        transform.translation.x += sin;
+        transform.translation.z += cos;
+        transform.translation.y = sin.abs() * 20.0;
+    }
 }
