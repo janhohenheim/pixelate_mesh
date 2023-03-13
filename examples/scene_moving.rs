@@ -1,12 +1,10 @@
 use bevy::prelude::*;
-use bevy_editor_pls::EditorPlugin;
 use pixelate_mesh::prelude::*;
 use std::f32::consts::PI;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugin(EditorPlugin)
         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
         .add_system(move_pixelated)
         .add_startup_system(setup)

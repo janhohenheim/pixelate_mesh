@@ -1,3 +1,5 @@
+#![allow(clippy::type_complexity)]
+#![allow(clippy::too_many_arguments)]
 #![forbid(missing_docs)]
 //! This crate provides a plugin for pixelating meshes.
 

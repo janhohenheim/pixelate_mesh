@@ -50,7 +50,7 @@ pub(crate) fn add_pixelation(
             let image_handle = images.add(image);
             commands
                 .entity(entity)
-                .insert((first_pass_layer, aabb.clone()));
+                .insert((first_pass_layer, aabb));
             commands.spawn((
                 Name::new("Pixelation Camera"),
                 Camera3dBundle {

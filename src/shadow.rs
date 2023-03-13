@@ -69,7 +69,7 @@ fn duplicate_children(
     shadow_material_handle: &Handle<StandardMaterial>,
 ) {
     let mut entity_commands = child_builder.spawn_empty();
-    if let Some(mesh_handle) = mesh_handles.get(entity).ok() {
+    if let Ok(mesh_handle) = mesh_handles.get(entity) {
         entity_commands.insert(PbrBundle {
             mesh: mesh_handle.clone(),
             material: shadow_material_handle.clone(),

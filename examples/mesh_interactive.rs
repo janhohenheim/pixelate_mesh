@@ -1,5 +1,4 @@
 use bevy::{input::mouse::MouseMotion, prelude::*};
-use bevy_editor_pls::EditorPlugin;
 use pixelate_mesh::prelude::*;
 
 fn main() {
@@ -7,7 +6,6 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
         .add_startup_system(setup)
-        .add_plugin(EditorPlugin)
         .add_system(move_camera)
         .run();
 }
