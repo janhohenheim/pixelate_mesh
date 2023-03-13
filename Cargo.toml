@@ -21,6 +21,8 @@ features = [
     "bevy_core_pipeline",
     "bevy_scene",
     "bevy_pbr",
+    "bevy_sprite",
+    "bevy_ui",
     "bevy_gltf",
     "png"
 ]
