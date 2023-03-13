@@ -58,7 +58,8 @@ where
                 )
                     .chain()
                     .in_base_set(CoreSet::PostUpdate),
-            );
+            )
+            .add_system(runtime::set_visible.in_base_set(CoreSet::PostUpdateFlush));
     }
 }
 

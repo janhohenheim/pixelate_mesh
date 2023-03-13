@@ -64,6 +64,11 @@ pub(crate) fn add_pixelation(
                         msaa_writeback: false,
                         ..default()
                     },
+                    projection: Projection::Perspective(PerspectiveProjection {
+                        near: 0.01,
+                        far: 0.02,
+                        ..default()
+                    }),
                     ..default()
                 },
                 PixelationCamera { target: entity },

@@ -2,7 +2,9 @@ use crate::creation::{create_image, create_material};
 use crate::util::get_max_radius;
 use crate::{Canvas, Pixelate, PixelationCamera};
 use bevy::render::camera::RenderTarget;
+use bevy::render::view::VisibleEntities;
 use bevy::{prelude::*, render::primitives::Aabb};
+use std::iter;
 
 /// Syncs the pixelation camera to the main camera.
 pub(crate) fn sync_cameras<T: Component>(
@@ -115,5 +117,17 @@ pub(crate) fn update_pixelation(
                 }
             }
         }
+    }
+}
+
+pub(crate) fn set_visible(
+    mut pixelation_camera_query: Query<(&PixelationCamera, &mut VisibleEntities)>,
+    children_query: Query<&Children>,
+) {
+    for (pixelation_camera, mut visible_entities) in pixelation_camera_query.iter_mut() {
+        let hierarchy = iter::once(pixelation_camera.target)
+            .chain(children_query.iter_descendants(pixelation_camera.target))
+            .collect();
+        visible_entities.entities = hierarchy;
     }
 }
