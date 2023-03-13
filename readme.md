@@ -69,7 +69,8 @@ fn setup(
 ## Inspiration
 
 The plugin tries to emulate the effect as seen in Prodeus:  
-<video src="https://www.youtube.com/watch?v=Vb-hPYOIwMw"></video>
+<video src="https://user-images.githubusercontent.com/9047632/224768897-f50f15fc-50ab-49a9-8c77-a33ef01fad5b.mp4"></video>
+[Source](https://www.youtube.com/watch?v=Vb-hPYOIwMw)
 
 ## Shortcomings
 
