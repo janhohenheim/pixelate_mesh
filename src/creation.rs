@@ -2,6 +2,7 @@ use crate::ready_checks::PixelationTargetReadyEvent;
 use crate::util::{get_max_radius, get_pixelation_render_layer};
 use crate::{Canvas, Pixelate, PixelationCamera};
 use bevy::pbr::{NotShadowCaster, NotShadowReceiver};
+use bevy::render::texture::ImageSampler;
 use bevy::{
     core_pipeline::clear_color::ClearColorConfig,
     prelude::*,
@@ -60,6 +61,7 @@ pub(crate) fn add_pixelation(
                     camera: Camera {
                         order: ordering.next(),
                         target: RenderTarget::Image(image_handle.clone()),
+                        msaa_writeback: false,
                         ..default()
                     },
                     ..default()
@@ -115,7 +117,7 @@ pub(crate) fn create_image(pixelate: Pixelate) -> Image {
     // This is the texture that will be rendered to.
     let mut image = Image {
         texture_descriptor: TextureDescriptor {
-            label: Some("pixelated render to texture"),
+            label: Some("Pixelation texture"),
             size,
             dimension: TextureDimension::D2,
             format: TextureFormat::Bgra8UnormSrgb,
@@ -126,6 +128,7 @@ pub(crate) fn create_image(pixelate: Pixelate) -> Image {
                 | TextureUsages::RENDER_ATTACHMENT,
             view_formats: &[],
         },
+        sampler_descriptor: ImageSampler::nearest(),
         ..default()
     };
     // fill image.data with zeroes
