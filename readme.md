@@ -4,6 +4,8 @@
 
 Apply a pixelation effect to any Bevy mesh or scene without post-processing.
 
+![Pixelated foxes](./docs/foxes.jpg?raw=true "Pixelated Foxes")
+
 ## Usage
 
 - Add the `PixelateMeshPlugin`, where you specify a component that tracks the main camera.
@@ -19,7 +21,7 @@ The tracking component is needed because the plugin draws the textures on 2D can
 
 ## Examples
 The following is an annotated minimal example. 
-More can be found in the [examples folder](https://github.com/janhohenheim/pixelate_mesh/tree/main/examples).
+More can be found in the [examples folder](./examples).
 
 ```rust
 use bevy::prelude::*;
@@ -71,4 +73,5 @@ The plugin tries to emulate the effect as seen in Prodeus:
 
 ## Shortcomings
 
-The current setup does not work with multiple main cameras. Feel free to comment [on the issue](https://github.com/janhohenheim/pixelate_mesh/issues/1) if you have an idea for how to fix this!
+- The current setup does not work with multiple main cameras. Feel free to comment [on the issue](https://github.com/janhohenheim/pixelate_mesh/issues/1) if you have an idea for how to fix this!
+- The plugin deactivates MSAA globally.
