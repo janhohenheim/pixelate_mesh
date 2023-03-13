@@ -48,6 +48,7 @@ where
                 recursive_layering::recursively_set_layer,
                 shadow::add_shadow_caster,
                 shadow::set_scene_shadow,
+                runtime::update_pixelation,
             ))
             .add_systems(
                 (

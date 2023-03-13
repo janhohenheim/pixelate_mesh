@@ -1,5 +1,7 @@
+use crate::creation::{create_image, create_material};
 use crate::util::get_max_radius;
 use crate::{Canvas, Pixelate, PixelationCamera};
+use bevy::render::camera::RenderTarget;
 use bevy::{prelude::*, render::primitives::Aabb};
 
 /// Syncs the pixelation camera to the main camera.
@@ -79,6 +81,38 @@ pub(crate) fn despawn_dependent_types(
         for pixelation_camera in pixelation_camera_query.iter() {
             if pixelation_camera == entity {
                 commands.entity(pixelation_camera).despawn_recursive();
+            }
+        }
+    }
+}
+
+pub(crate) fn update_pixelation(
+    mut commands: Commands,
+    pixelate_query: Query<(Entity, &Pixelate), Changed<Pixelate>>,
+    mut pixelation_camera_query: Query<(&PixelationCamera, &mut Camera)>,
+    canvas_query: Query<(&Canvas, &Children)>,
+    with_standard_material: Query<Entity, With<Handle<StandardMaterial>>>,
+    mut standard_materials: ResMut<Assets<StandardMaterial>>,
+    mut images: ResMut<Assets<Image>>,
+) {
+    for (entity, pixelate) in pixelate_query.iter() {
+        if let Some((_, mut camera)) = pixelation_camera_query
+            .iter_mut()
+            .find(|(pixelation_camera, _)| pixelation_camera.target == entity)
+        {
+            if let Some((_, children)) = canvas_query
+                .iter()
+                .find(|(canvas, _)| canvas.target == entity)
+            {
+                if let Some(entity) = children
+                    .iter()
+                    .find(|entity| with_standard_material.contains(**entity))
+                {
+                    let image_handle = images.add(create_image(*pixelate));
+                    camera.target = RenderTarget::Image(image_handle.clone());
+                    let material_handle = standard_materials.add(create_material(image_handle));
+                    commands.entity(*entity).insert(material_handle);
+                }
             }
         }
     }

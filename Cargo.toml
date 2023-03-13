@@ -7,10 +7,6 @@ exclude = ["assets"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[features]
-default = []
-bevy_dylib = ["bevy/bevy_dylib"]
-
 [dev-dependencies]
 bevy_editor_pls = "0.3.0"
 

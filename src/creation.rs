@@ -79,12 +79,7 @@ pub(crate) fn add_pixelation(
                         Name::new("Canvas Mesh"),
                         PbrBundle {
                             mesh: plane_handle,
-                            material: materials.add(StandardMaterial {
-                                base_color_texture: Some(image_handle.clone()),
-                                unlit: true,
-                                alpha_mode: AlphaMode::Blend,
-                                ..default()
-                            }),
+                            material: materials.add(create_material(image_handle)),
                             transform: Transform::from_rotation(Quat::from_rotation_y(PI)),
                             ..default()
                         },
@@ -102,7 +97,16 @@ fn create_canvas_mesh(aabb: &Aabb) -> Mesh {
     Mesh::from(shape::Quad { size, flip: false })
 }
 
-fn create_image(pixelate: Pixelate) -> Image {
+pub(crate) fn create_material(image_handle: Handle<Image>) -> StandardMaterial {
+    StandardMaterial {
+        base_color_texture: Some(image_handle),
+        unlit: true,
+        alpha_mode: AlphaMode::Blend,
+        ..default()
+    }
+}
+
+pub(crate) fn create_image(pixelate: Pixelate) -> Image {
     let size = Extent3d {
         width: pixelate.horizontal_pixels,
         height: pixelate.vertical_pixels,
