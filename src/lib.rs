@@ -12,6 +12,7 @@ mod creation;
 mod ready_checks;
 mod recursive_layering;
 mod runtime;
+mod shadow;
 mod util;
 
 /// The plugin type for this crate.
@@ -36,17 +37,27 @@ where
         app.register_type::<Pixelate>()
             .init_resource::<ready_checks::ToPixelate>()
             .init_resource::<creation::Ordering>()
+            .init_resource::<shadow::SetSceneShadow>()
             .insert_resource(Msaa::Off)
             .add_event::<ready_checks::PixelationTargetReadyEvent>()
+            .add_startup_system(shadow::create_shadow_material)
             .add_systems((
                 ready_checks::get_ready_pixelation_targets,
                 ready_checks::mark_for_pixelation,
                 creation::add_pixelation,
                 recursive_layering::recursively_set_layer,
-                runtime::position_canvas::<C>,
-                runtime::sync_cameras::<C>,
-                runtime::despawn_dependent_types,
-            ));
+                shadow::add_shadow_caster,
+                shadow::set_scene_shadow,
+            ))
+            .add_systems(
+                (
+                    runtime::position_canvas::<C>,
+                    runtime::sync_cameras::<C>,
+                    runtime::despawn_dependent_types,
+                )
+                    .chain()
+                    .in_base_set(CoreSet::PostUpdate),
+            );
     }
 }
 

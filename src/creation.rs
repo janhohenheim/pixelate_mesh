@@ -1,6 +1,7 @@
 use crate::ready_checks::PixelationTargetReadyEvent;
 use crate::util::{get_max_radius, get_pixelation_render_layer};
 use crate::{Canvas, Pixelate, PixelationCamera};
+use bevy::pbr::{NotShadowCaster, NotShadowReceiver};
 use bevy::{
     core_pipeline::clear_color::ClearColorConfig,
     prelude::*,
@@ -87,6 +88,8 @@ pub(crate) fn add_pixelation(
                             transform: Transform::from_rotation(Quat::from_rotation_y(PI)),
                             ..default()
                         },
+                        NotShadowCaster,
+                        NotShadowReceiver,
                     ));
                 });
         }

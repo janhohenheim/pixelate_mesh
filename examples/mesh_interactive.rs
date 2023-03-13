@@ -26,6 +26,15 @@ fn setup(
         PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
             material: materials.add(Color::WHITE.into()),
+            transform: Transform::from_xyz(0.0, 0.5, 0.0),
+            ..default()
+        },
+    ));
+    commands.spawn((
+        Name::new("Ground"),
+        PbrBundle {
+            mesh: meshes.add(shape::Plane::from_size(10.0).into()),
+            material: materials.add(Color::WHITE.into()),
             ..default()
         },
     ));
@@ -42,7 +51,12 @@ fn setup(
     commands.spawn((
         Name::new("Light"),
         PointLightBundle {
-            transform: Transform::from_translation(Vec3::new(0.0, 10.0, 10.0)),
+            point_light: PointLight {
+                shadows_enabled: true,
+                shadow_depth_bias: 0.05,
+                ..Default::default()
+            },
+            transform: Transform::from_translation(Vec3::new(5.0, 10.0, 10.0)),
             ..default()
         },
     ));
