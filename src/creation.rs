@@ -46,7 +46,7 @@ pub(crate) fn add_pixelation(
             let aabb = mesh.compute_aabb().unwrap();
             let plane_handle = meshes.add(create_canvas_mesh(&aabb));
             let pixelate = pixelate_query.get(entity).unwrap();
-            let image = create_image(*pixelate);
+            let image = create_canvas_image(*pixelate);
             let image_handle = images.add(image);
             commands
                 .entity(entity)
@@ -86,7 +86,7 @@ pub(crate) fn add_pixelation(
                         Name::new("Canvas Mesh"),
                         PbrBundle {
                             mesh: plane_handle,
-                            material: materials.add(create_material(image_handle)),
+                            material: materials.add(create_canvas_material(image_handle)),
                             transform: Transform::from_rotation(Quat::from_rotation_y(PI)),
                             ..default()
                         },
@@ -104,7 +104,7 @@ fn create_canvas_mesh(aabb: &Aabb) -> Mesh {
     Mesh::from(shape::Quad { size, flip: false })
 }
 
-pub(crate) fn create_material(image_handle: Handle<Image>) -> StandardMaterial {
+pub(crate) fn create_canvas_material(image_handle: Handle<Image>) -> StandardMaterial {
     StandardMaterial {
         base_color_texture: Some(image_handle),
         unlit: true,
@@ -113,7 +113,7 @@ pub(crate) fn create_material(image_handle: Handle<Image>) -> StandardMaterial {
     }
 }
 
-pub(crate) fn create_image(pixelate: Pixelate) -> Image {
+pub(crate) fn create_canvas_image(pixelate: Pixelate) -> Image {
     let size = Extent3d {
         width: pixelate.horizontal_pixels,
         height: pixelate.vertical_pixels,

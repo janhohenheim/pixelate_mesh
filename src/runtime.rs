@@ -1,4 +1,4 @@
-use crate::creation::{create_image, create_material};
+use crate::creation::{create_canvas_image, create_canvas_material};
 use crate::util::get_max_radius;
 use crate::{Canvas, Pixelate, PixelationCamera};
 use bevy::render::camera::RenderTarget;
@@ -110,9 +110,10 @@ pub(crate) fn update_pixelation(
                     .iter()
                     .find(|entity| with_standard_material.contains(**entity))
                 {
-                    let image_handle = images.add(create_image(*pixelate));
+                    let image_handle = images.add(create_canvas_image(*pixelate));
                     camera.target = RenderTarget::Image(image_handle.clone());
-                    let material_handle = standard_materials.add(create_material(image_handle));
+                    let material_handle =
+                        standard_materials.add(create_canvas_material(image_handle));
                     commands.entity(*entity).insert(material_handle);
                 }
             }
@@ -123,10 +124,14 @@ pub(crate) fn update_pixelation(
 pub(crate) fn set_visible(
     mut pixelation_camera_query: Query<(&PixelationCamera, &mut VisibleEntities)>,
     children_query: Query<&Children>,
+    meshes: Query<&Handle<Mesh>>,
 ) {
     for (pixelation_camera, mut visible_entities) in pixelation_camera_query.iter_mut() {
-        let hierarchy = iter::once(pixelation_camera.target)
-            .chain(children_query.iter_descendants(pixelation_camera.target))
+        let parent = pixelation_camera.target;
+        let descendants = children_query.iter_descendants(parent);
+        let hierarchy = iter::once(parent)
+            .chain(descendants)
+            .filter(|entity| meshes.contains(*entity))
             .collect();
         visible_entities.entities = hierarchy;
     }
