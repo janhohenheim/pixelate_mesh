@@ -72,6 +72,7 @@ mod shadow;
 mod util;
 
 /// The plugin type for this crate.
+/// The generic parameter `C` is the type of the component that tracks the main camera.
 #[derive(Debug)]
 pub struct PixelateMeshPlugin<C: Component> {
     _camera_type: std::marker::PhantomData<C>,
