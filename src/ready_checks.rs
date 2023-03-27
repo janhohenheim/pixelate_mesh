@@ -49,43 +49,43 @@ pub(crate) fn get_ready_pixelation_targets(
 ) {
     let mut pixelation_targets = HashMap::new();
     for &entity in to_pixelate.iter() {
-        let (mesh_handle, scene_handle, scene_instance) = pixelate_query.get(entity).unwrap();
-        if scene_handle.is_some() {
-            debug!("Pixelating a scene; waiting for it to load...");
-            if let Some(scene_instance) = scene_instance {
-                debug!("The scene is loaded, waiting for it to be ready...");
-                let scene_instance = **scene_instance;
-                if scene_spawner.instance_is_ready(scene_instance) {
-                    let mesh_handle = scene_spawner
-                        .iter_instance_entities(scene_instance)
-                        .filter_map(|entity| mesh_handles.get(entity).ok())
-                        .next()
-                        .unwrap();
+        if let Ok((mesh_handle, scene_handle, scene_instance)) = pixelate_query.get(entity) {
+            if scene_handle.is_some() {
+                debug!("Pixelating a scene; waiting for it to load...");
+                if let Some(scene_instance) = scene_instance {
+                    debug!("The scene is loaded, waiting for it to be ready...");
+                    let scene_instance = **scene_instance;
+                    if scene_spawner.instance_is_ready(scene_instance) {
+                        let mesh_handle = scene_spawner
+                            .iter_instance_entities(scene_instance)
+                            .find_map(|entity| mesh_handles.get(entity).ok())
+                            .unwrap();
 
-                    debug!("The scene is ready!");
+                        debug!("The scene is ready!");
+                        pixelation_targets.insert(
+                            entity,
+                            PixelationTarget {
+                                mesh_handle: mesh_handle.clone(),
+                                kind: PixelationTargetKind::Scene,
+                            },
+                        );
+                    }
+                }
+            } else if let Some(mesh_handle) = mesh_handle {
+                debug!("Pixelating a mesh; waiting for it to load...");
+                if meshes.contains(mesh_handle) {
+                    debug!("The mesh is loaded!");
                     pixelation_targets.insert(
                         entity,
                         PixelationTarget {
                             mesh_handle: mesh_handle.clone(),
-                            kind: PixelationTargetKind::Scene,
+                            kind: PixelationTargetKind::Mesh,
                         },
                     );
                 }
+            } else {
+                panic!("The Pixelate component can only be added to entities with a Mesh or a Scene, but found neither.");
             }
-        } else if let Some(mesh_handle) = mesh_handle {
-            debug!("Pixelating a mesh; waiting for it to load...");
-            if meshes.contains(mesh_handle) {
-                debug!("The mesh is loaded!");
-                pixelation_targets.insert(
-                    entity,
-                    PixelationTarget {
-                        mesh_handle: mesh_handle.clone(),
-                        kind: PixelationTargetKind::Mesh,
-                    },
-                );
-            }
-        } else {
-            panic!("The Pixelate component can only be added to entities with a Mesh or a Scene, but found neither.");
         }
     }
     let ready = pixelation_targets.keys().copied().collect();
