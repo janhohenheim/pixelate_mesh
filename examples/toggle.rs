@@ -13,17 +13,19 @@ fn main() {
 #[derive(Component)]
 struct MainCamera;
 
+#[derive(Component)]
+struct Pixelatable;
+
 fn toggle(
     mut commands: Commands,
-    query: Query<Entity, With<Pixelate>>,
+    query: Query<Entity, With<Pixelatable>>,
     mut pixelate_state: Local<bool>,
     keys: Res<Input<KeyCode>>,
 ) {
     if keys.just_pressed(KeyCode::Space) {
         *pixelate_state = !*pixelate_state;
         for pixelated_entity in &query {
-            // inverted because: Local<T> uses default value and default of bool is false.
-            if !*pixelate_state {
+            if *pixelate_state {
                 commands
                     .entity(pixelated_entity)
                     .insert(Pixelate::splat(64));
@@ -41,7 +43,7 @@ fn setup(
 ) {
     commands.spawn((
         Name::new("Cube"),
-        Pixelate::splat(64),
+        Pixelatable,
         PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
             material: materials.add(Color::WHITE.into()),
