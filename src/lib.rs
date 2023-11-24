@@ -24,7 +24,7 @@
 //!         .add_plugins(DefaultPlugins)
 //!         // Add the plugin
 //!         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
-//!         .add_startup_system(setup)
+//!         .add_systems(Startupsetup)
 //!         .run();
 //! }
 //!
@@ -97,8 +97,8 @@ where
             .init_resource::<shadow::SetSceneShadow>()
             .insert_resource(Msaa::Off)
             .add_event::<ready_checks::PixelationTargetReadyEvent>()
-            .add_startup_system(shadow::create_shadow_material)
-            .add_systems((
+            .add_systems(Startup, shadow::create_shadow_material)
+            .add_systems(Update,(
                 ready_checks::get_ready_pixelation_targets,
                 ready_checks::mark_for_pixelation,
                 creation::add_pixelation,
@@ -107,16 +107,16 @@ where
                 shadow::set_scene_shadow,
                 runtime::update_pixelation,
             ))
-            .add_systems(
+            .add_systems(PostUpdate,
                 (
                     runtime::position_canvas::<C>,
                     runtime::sync_cameras::<C>,
                     runtime::despawn_dependent_types,
                 )
-                    .chain()
-                    .in_base_set(CoreSet::PostUpdate),
+                    .chain(),
             )
-            .add_system(runtime::set_visible.in_base_set(CoreSet::PostUpdateFlush));
+            .add_systems(PostUpdate,
+                         runtime::set_visible);
     }
 }
 

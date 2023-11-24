@@ -33,7 +33,7 @@ pub(crate) fn add_shadow_caster(
     shadow_material_handle: Res<ShadowMaterialHandle>,
     mut set_scene_shadow: ResMut<SetSceneShadow>,
 ) {
-    for event in ready_event.iter() {
+    for event in ready_event.read() {
         for (&entity, target) in event.iter() {
             match target.kind {
                 PixelationTargetKind::Mesh => {

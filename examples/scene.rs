@@ -5,8 +5,8 @@ use std::f32::consts::PI;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
-        .add_startup_system(setup)
+        .add_plugins(PixelateMeshPlugin::<MainCamera>::default())
+        .add_systems(Startup,setup)
         .run();
 }
 

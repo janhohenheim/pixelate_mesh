@@ -32,7 +32,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         // Add the plugin
         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
-        .add_startup_system(setup)
+        .add_systems(Startupsetup)
         .run();
 }
 

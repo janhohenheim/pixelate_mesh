@@ -17,7 +17,7 @@ pub(crate) fn mark_for_pixelation(
     }
 }
 
-#[derive(Debug, Default, Deref, DerefMut)]
+#[derive(Debug, Default, Deref, DerefMut, Event)]
 pub(crate) struct PixelationTargetReadyEvent(HashMap<Entity, PixelationTarget>);
 
 #[derive(Debug, Clone)]

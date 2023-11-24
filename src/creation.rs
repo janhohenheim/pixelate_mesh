@@ -126,7 +126,7 @@ pub(crate) fn create_canvas_image(pixelate: Pixelate) -> Image {
                 | TextureUsages::RENDER_ATTACHMENT,
             view_formats: &[],
         },
-        sampler_descriptor: ImageSampler::nearest(),
+        sampler: ImageSampler::nearest(),
         ..default()
     };
     // fill image.data with zeroes
