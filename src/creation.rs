@@ -39,7 +39,7 @@ pub(crate) fn add_pixelation(
 ) {
     // This specifies the layer used for the first pass, which will be attached to the first pass camera and cube.
     let first_pass_layer = get_pixelation_render_layer();
-    for event in pixelation_target_ready_reader.iter() {
+    for event in pixelation_target_ready_reader.read() {
         for (&entity, target) in event.iter() {
             debug!("Spawning canvas");
             let mesh = meshes.get(&target.mesh_handle).unwrap();
