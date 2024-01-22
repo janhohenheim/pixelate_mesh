@@ -4,9 +4,9 @@ use pixelate_mesh::prelude::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
-        .add_startup_system(setup)
-        .add_system(move_camera)
+        .add_plugins(PixelateMeshPlugin::<MainCamera>::default())
+        .add_systems(Startup,setup)
+        .add_systems(Update, move_camera)
         .run();
 }
 
@@ -67,7 +67,7 @@ fn move_camera(
 ) {
     let dt = time.delta_seconds();
     let mut camera_transform = query.single_mut();
-    let total_motion: Vec2 = mouse_motion_events.iter().map(|e| e.delta).sum();
+    let total_motion: Vec2 = mouse_motion_events.read().map(|e| e.delta).sum();
     let sensitivity = 0.1;
     let motion = total_motion * sensitivity * dt;
     let pitch = Quat::from_axis_angle(camera_transform.right(), -motion.y);

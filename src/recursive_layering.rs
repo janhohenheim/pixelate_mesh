@@ -12,7 +12,7 @@ pub(crate) fn recursively_set_layer(
     scene_spawner: Res<SceneSpawner>,
 ) {
     let first_pass_layer = get_pixelation_render_layer();
-    for event in ready_events.iter() {
+    for event in ready_events.read() {
         for (&entity, pixelation_target) in event.iter() {
             match pixelation_target.kind {
                 PixelationTargetKind::Mesh => {

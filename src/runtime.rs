@@ -73,7 +73,7 @@ pub(crate) fn despawn_dependent_types(
     canvas_query: Query<Entity, With<Canvas>>,
     pixelation_camera_query: Query<Entity, With<PixelationCamera>>,
 ) {
-    for entity in removed_pixelate.iter() {
+    for entity in removed_pixelate.read() {
         debug!("Pixelate was removed from an entity; removing canvas and pixelation camera that held it as target.");
         for canvas in canvas_query.iter() {
             if canvas == entity {

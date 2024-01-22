@@ -11,7 +11,7 @@ keywords = ["bevy", "pixelate", "pixelation", "mesh", "scene"]
 categories = ["game-development", "graphics", "rendering"]
 
 [dependencies.bevy]
-version = "0.10"
+version = "0.12.1"
 default-features = false
 features = [
     "bevy_asset",
@@ -24,5 +24,6 @@ features = [
     "bevy_sprite",
     "bevy_ui",
     "bevy_gltf",
-    "png"
+    "png",
+    "tonemapping_luts"
 ]
