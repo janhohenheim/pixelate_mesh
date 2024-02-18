@@ -44,14 +44,6 @@ fn setup(
             ..default()
         },
     ));
-    commands.spawn((
-        Name::new("Ground"),
-        PbrBundle {
-            mesh: meshes.add(Plane3d::default()),
-            material: materials.add(StandardMaterial::from(Color::WHITE)),
-            ..default()
-        },
-    ));
 
     commands.spawn((
         Name::new("Camera"),

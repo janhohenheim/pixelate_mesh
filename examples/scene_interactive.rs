@@ -30,15 +30,6 @@ fn setup(
     ));
 
     commands.spawn((
-        Name::new("Ground"),
-        PbrBundle {
-            mesh: meshes.add(Plane3d::default()),
-            material: materials.add(StandardMaterial::from(Color::WHITE)),
-            ..default()
-        },
-    ));
-
-    commands.spawn((
         Name::new("Camera"),
         MainCamera,
         Camera3dBundle {
