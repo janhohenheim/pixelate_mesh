@@ -4,9 +4,9 @@ use crate::{Canvas, Pixelate, PixelationCamera};
 use bevy::pbr::{NotShadowCaster, NotShadowReceiver};
 use bevy::render::texture::ImageSampler;
 use bevy::{
-    core_pipeline::clear_color::ClearColorConfig,
     prelude::*,
     render::{
+        camera::ClearColorConfig,
         camera::RenderTarget,
         primitives::Aabb,
         render_resource::{
@@ -52,13 +52,10 @@ pub(crate) fn add_pixelation(
             commands.spawn((
                 Name::new("Pixelation Camera"),
                 Camera3dBundle {
-                    camera_3d: Camera3d {
-                        clear_color: ClearColorConfig::Custom(Color::NONE),
-                        ..default()
-                    },
                     camera: Camera {
                         order: ordering.next(),
                         target: RenderTarget::Image(image_handle.clone()),
+                        clear_color: ClearColorConfig::Custom(Color::NONE),
                         msaa_writeback: false,
                         ..default()
                     },
@@ -94,7 +91,7 @@ pub(crate) fn add_pixelation(
 fn create_canvas_mesh(aabb: &Aabb) -> Mesh {
     let radius = get_max_radius(aabb);
     let size = Vec2::splat(radius * 2.);
-    Mesh::from(shape::Quad { size, flip: false })
+    Mesh::from(Rectangle::from_size(size))
 }
 
 pub(crate) fn create_canvas_material(image_handle: Handle<Image>) -> StandardMaterial {

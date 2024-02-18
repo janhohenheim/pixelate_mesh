@@ -14,26 +14,12 @@ fn main() {
 #[derive(Component)]
 struct MainCamera;
 
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
-) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         Name::new("Fox"),
         Pixelate::splat(128),
         SceneBundle {
             scene: asset_server.load("Fox.glb#Scene0"),
-            ..default()
-        },
-    ));
-
-    commands.spawn((
-        Name::new("Ground"),
-        PbrBundle {
-            mesh: meshes.add(shape::Plane::from_size(500000.0).into()),
-            material: materials.add(Color::WHITE.into()),
             ..default()
         },
     ));
@@ -75,7 +61,7 @@ fn move_camera(
     let total_motion: Vec2 = mouse_motion_events.read().map(|e| e.delta).sum();
     let sensitivity = 0.1;
     let motion = total_motion * sensitivity * dt;
-    let pitch = Quat::from_axis_angle(camera_transform.right(), -motion.y);
+    let pitch = Quat::from_axis_angle(*camera_transform.right(), -motion.y);
     let yaw = Quat::from_rotation_y(-motion.x);
     let target = Vec3::Y * 50.0;
     camera_transform.rotate_around(target, pitch * yaw);

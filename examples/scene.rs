@@ -6,33 +6,19 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(PixelateMeshPlugin::<MainCamera>::default())
-        .add_systems(Startup,setup)
+        .add_systems(Startup, setup)
         .run();
 }
 
 #[derive(Component)]
 struct MainCamera;
 
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
-) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         Name::new("Fox"),
         Pixelate::splat(128),
         SceneBundle {
             scene: asset_server.load("Fox.glb#Scene0"),
-            ..default()
-        },
-    ));
-
-    commands.spawn((
-        Name::new("Ground"),
-        PbrBundle {
-            mesh: meshes.add(shape::Plane::from_size(500000.0).into()),
-            material: materials.add(Color::WHITE.into()),
             ..default()
         },
     ));

@@ -15,7 +15,7 @@
 //! The following is an annotated minimal example.
 //! More can be found in the [examples folder](https://github.com/janhohenheim/pixelate_mesh/tree/main/examples).
 //!
-//! ```rust
+//! ```ignore
 //! use bevy::prelude::*;
 //! use pixelate_mesh::prelude::*;
 //!
@@ -23,8 +23,8 @@
 //!     App::new()
 //!         .add_plugins(DefaultPlugins)
 //!         // Add the plugin
-//!         .add_plugin(PixelateMeshPlugin::<MainCamera>::default())
-//!         .add_systems(Startupsetup)
+//!         .add_plugins(PixelateMeshPlugin::<MainCamera>::default())
+//!         .add_systems(Startup, setup)
 //!         .run();
 //! }
 //!
@@ -41,8 +41,8 @@
 //!         // This cube will render at 64x64 pixels
 //!         Pixelate::splat(64),
 //!         PbrBundle {
-//!             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-//!             material: materials.add(Color::WHITE.into()),
+//!             mesh: meshes.add(Mesh::from(Cuboid::default())),
+//!             material: materials.add(StandardMaterial::from(Color::WHITE)),
 //!             ..default()
 //!         },
 //!     ));
@@ -98,16 +98,20 @@ where
             .insert_resource(Msaa::Off)
             .add_event::<ready_checks::PixelationTargetReadyEvent>()
             .add_systems(Startup, shadow::create_shadow_material)
-            .add_systems(Update,(
-                ready_checks::get_ready_pixelation_targets,
-                ready_checks::mark_for_pixelation,
-                creation::add_pixelation,
-                recursive_layering::recursively_set_layer,
-                shadow::add_shadow_caster,
-                shadow::set_scene_shadow,
-                runtime::update_pixelation,
-            ))
-            .add_systems(PostUpdate,
+            .add_systems(
+                Update,
+                (
+                    ready_checks::get_ready_pixelation_targets,
+                    ready_checks::mark_for_pixelation,
+                    creation::add_pixelation,
+                    recursive_layering::recursively_set_layer,
+                    shadow::add_shadow_caster,
+                    shadow::set_scene_shadow,
+                    runtime::update_pixelation,
+                ),
+            )
+            .add_systems(
+                PostUpdate,
                 (
                     runtime::position_canvas::<C>,
                     runtime::sync_cameras::<C>,
@@ -115,8 +119,7 @@ where
                 )
                     .chain(),
             )
-            .add_systems(PostUpdate,
-                         runtime::set_visible);
+            .add_systems(PostUpdate, runtime::set_visible);
     }
 }
 

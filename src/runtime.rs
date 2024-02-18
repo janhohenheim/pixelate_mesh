@@ -21,7 +21,7 @@ pub(crate) fn sync_cameras<T: Component>(
             {
                 *pixelation_camera_transform = outer_camera_transform.looking_at(
                     main_object_transform.translation,
-                    outer_camera_transform.up(),
+                    *outer_camera_transform.up(),
                 );
                 pixelation_camera_transform.translation = main_object_transform.translation;
                 let back = pixelation_camera_transform.back();
@@ -52,7 +52,7 @@ pub(crate) fn position_canvas<T: Component>(
         if let Ok((main_object_transform, aabb)) = main_object_query.get(canvas.target) {
             for camera_transform in outer_camera_query.iter() {
                 *canvas_transform = main_object_transform
-                    .looking_at(camera_transform.translation, camera_transform.up());
+                    .looking_at(camera_transform.translation, *camera_transform.up());
                 let forward = canvas_transform.forward();
                 let radius = get_max_radius(aabb);
                 canvas_transform.translation += forward * radius;
