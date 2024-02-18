@@ -17,6 +17,7 @@ The tracking component is needed because the plugin draws the textures on 2D can
 ## Compatibility
 | bevy | pixelate_mesh |
 |------|---------------|
+| 0.13 | 0.3           |
 | 0.12 | 0.2           |
 | 0.10 | 0.1           |
 

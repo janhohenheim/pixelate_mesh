@@ -6,7 +6,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(PixelateMeshPlugin::<MainCamera>::default())
-        .add_systems(Startup,setup)
+        .add_systems(Startup, setup)
         .run();
 }
 
@@ -31,8 +31,8 @@ fn setup(
     commands.spawn((
         Name::new("Ground"),
         PbrBundle {
-            mesh: meshes.add(shape::Plane::from_size(500000.0).into()),
-            material: materials.add(Color::WHITE.into()),
+            mesh: meshes.add(Plane3d::default()),
+            material: materials.add(StandardMaterial::from(Color::WHITE)),
             ..default()
         },
     ));

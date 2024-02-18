@@ -32,8 +32,8 @@ fn setup(
     commands.spawn((
         Name::new("Ground"),
         PbrBundle {
-            mesh: meshes.add(shape::Plane::from_size(500000.0).into()),
-            material: materials.add(Color::WHITE.into()),
+            mesh: meshes.add(Plane3d::default()),
+            material: materials.add(StandardMaterial::from(Color::WHITE)),
             ..default()
         },
     ));
@@ -75,7 +75,7 @@ fn move_camera(
     let total_motion: Vec2 = mouse_motion_events.read().map(|e| e.delta).sum();
     let sensitivity = 0.1;
     let motion = total_motion * sensitivity * dt;
-    let pitch = Quat::from_axis_angle(camera_transform.right(), -motion.y);
+    let pitch = Quat::from_axis_angle(*camera_transform.right(), -motion.y);
     let yaw = Quat::from_rotation_y(-motion.x);
     let target = Vec3::Y * 50.0;
     camera_transform.rotate_around(target, pitch * yaw);

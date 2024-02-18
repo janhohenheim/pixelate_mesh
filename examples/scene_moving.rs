@@ -31,8 +31,8 @@ fn setup(
     commands.spawn((
         Name::new("Ground"),
         PbrBundle {
-            mesh: meshes.add(shape::Plane::from_size(500000.0).into()),
-            material: materials.add(Color::WHITE.into()),
+            mesh: meshes.add(Plane3d::default()),
+            material: materials.add(StandardMaterial::from(Color::WHITE)),
             ..default()
         },
     ));
