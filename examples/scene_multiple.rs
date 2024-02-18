@@ -13,14 +13,9 @@ fn main() {
 #[derive(Component)]
 struct MainCamera;
 
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    asset_server: Res<AssetServer>,
-) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
-        Name::new("Fox high rez"),
+        Name::new("Fox high res"),
         SceneBundle {
             scene: asset_server.load("Fox.glb#Scene0"),
             transform: Transform::from_xyz(-50.0, 0.0, 0.0),
@@ -28,7 +23,7 @@ fn setup(
         },
     ));
     commands.spawn((
-        Name::new("Fox mid rez"),
+        Name::new("Fox mid res"),
         Pixelate::splat(256),
         SceneBundle {
             scene: asset_server.load("Fox.glb#Scene0"),
@@ -36,7 +31,7 @@ fn setup(
         },
     ));
     commands.spawn((
-        Name::new("Fox low rez"),
+        Name::new("Fox low res"),
         Pixelate::splat(128),
         SceneBundle {
             scene: asset_server.load("Fox.glb#Scene0"),
