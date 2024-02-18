@@ -22,7 +22,7 @@ fn setup(
         Name::new("Cube"),
         Pixelate::splat(64),
         PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+            mesh: meshes.add(Mesh::from(Cuboid::default())),
             material: materials.add(StandardMaterial::from(Color::WHITE)),
             transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()

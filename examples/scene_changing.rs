@@ -6,7 +6,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(PixelateMeshPlugin::<MainCamera>::default())
-        .add_systems(Startup ,setup)
+        .add_systems(Startup, setup)
         .add_systems(Update, change_pixelation)
         .run();
 }

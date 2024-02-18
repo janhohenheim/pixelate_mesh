@@ -91,7 +91,7 @@ pub(crate) fn add_pixelation(
 fn create_canvas_mesh(aabb: &Aabb) -> Mesh {
     let radius = get_max_radius(aabb);
     let size = Vec2::splat(radius * 2.);
-    Mesh::from(shape::Quad { size, flip: false })
+    Mesh::from(Rectangle::from_size(size))
 }
 
 pub(crate) fn create_canvas_material(image_handle: Handle<Image>) -> StandardMaterial {
