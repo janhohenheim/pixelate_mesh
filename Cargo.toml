@@ -1,6 +1,6 @@
 [package]
 name = "pixelate_mesh"
-version = "0.4.0-rc"
+version = "0.4.0-rc.2"
 authors = ["Jan Hohenheim <jan@hohenheim.ch>"]
 edition = "2021"
 exclude = ["assets", "docs"]

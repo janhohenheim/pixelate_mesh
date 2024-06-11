@@ -1,9 +1,12 @@
 use crate::creation::{create_canvas_image, create_canvas_material};
 use crate::util::get_max_radius;
 use crate::{Canvas, Pixelate, PixelationCamera};
+use bevy::pbr::WithLight;
 use bevy::render::camera::RenderTarget;
 use bevy::render::view::{VisibleEntities, WithMesh};
-use bevy::utils::TypeIdMap;
+use bevy::sprite::WithMesh2d;
+use bevy::ui::WithNode;
+use bevy::utils::{HashSet, TypeIdMap};
 use bevy::{prelude::*, render::primitives::Aabb};
 use std::any::TypeId;
 use std::iter;
@@ -126,16 +129,24 @@ pub(crate) fn update_pixelation(
 pub(crate) fn set_visible(
     mut pixelation_camera_query: Query<(&PixelationCamera, &mut VisibleEntities)>,
     children_query: Query<&Children>,
-    meshes: Query<&Handle<Mesh>>,
 ) {
     for (pixelation_camera, mut visible_entities) in pixelation_camera_query.iter_mut() {
         let parent = pixelation_camera.target;
         let descendants = children_query.iter_descendants(parent);
-        let hierarchy = iter::once(parent)
-            .chain(descendants)
-            .filter(|entity| meshes.contains(*entity))
-            .collect();
-        let new_visible_entities = TypeIdMap::from_iter([(TypeId::of::<WithMesh>(), hierarchy)]);
-        visible_entities.entities = new_visible_entities;
+        let allowed: HashSet<_> = iter::once(parent).chain(descendants).collect();
+
+        let with_mesh: HashSet<_> = visible_entities.get::<WithMesh>().iter().copied().collect();
+        let with_mesh_allowed = with_mesh.intersection(&allowed).copied().collect();
+        let with_light = visible_entities.get::<WithLight>().to_vec();
+        let with_mesh2d = visible_entities.get::<WithMesh2d>().to_vec();
+        let with_node = visible_entities.get::<WithNode>().to_vec();
+
+        let entities = TypeIdMap::from_iter([
+            (TypeId::of::<WithMesh>(), with_mesh_allowed),
+            (TypeId::of::<WithLight>(), with_light),
+            (TypeId::of::<WithMesh2d>(), with_mesh2d),
+            (TypeId::of::<WithNode>(), with_node),
+        ]);
+        visible_entities.entities = entities;
     }
 }
