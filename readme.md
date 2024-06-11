@@ -1,4 +1,5 @@
-# Pixelate Mesh 
+# Pixelate Mesh
+
 [![crates.io](https://img.shields.io/crates/v/pixelate_mesh)](https://crates.io/crates/pixelate_mesh)
 [![docs.rs](https://docs.rs/pixelate_mesh/badge.svg)](https://docs.rs/pixelate_mesh)
 
@@ -12,9 +13,11 @@ Apply a pixelation effect to any Bevy mesh or scene without post-processing.
 - Add this tracking component to your camera.
 - Add the `Pixelate` component to any entity that you want to pixelate.
 
-The tracking component is needed because the plugin draws the textures on 2D canvases that need to rotate to always face the main camera.
+The tracking component is needed because the plugin draws the textures on 2D canvases that need to rotate to always face
+the main camera.
 
 ## Compatibility
+
 | bevy        | pixelate_mesh |
 |-------------|---------------|
 | 0.14.0-rc.2 | 0.4.0-rc      |
@@ -23,7 +26,8 @@ The tracking component is needed because the plugin draws the textures on 2D can
 | 0.10        | 0.1           |
 
 ## Examples
-The following is an annotated minimal example. 
+
+The following is an annotated minimal example.
 More can be found in the [examples folder](./examples).
 
 ```rust
@@ -77,5 +81,7 @@ The plugin tries to emulate the effect as seen in Prodeus:
 
 ## Shortcomings
 
-- The current setup does not work with multiple main cameras. Feel free to comment [on the issue](https://github.com/janhohenheim/pixelate_mesh/issues/1) if you have an idea for how to fix this!
+- The current setup does not work with multiple main cameras. Feel free to
+  comment [on the issue](https://github.com/janhohenheim/pixelate_mesh/issues/1) if you have an idea for how to fix
+  this!
 - The plugin deactivates MSAA globally.
