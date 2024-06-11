@@ -3,9 +3,8 @@ use crate::util::get_max_radius;
 use crate::{Canvas, Pixelate, PixelationCamera};
 use bevy::render::camera::RenderTarget;
 use bevy::render::view::{VisibleEntities, WithMesh};
-use bevy::utils::TypeIdMap;
+use bevy::utils::HashSet;
 use bevy::{prelude::*, render::primitives::Aabb};
-use std::any::TypeId;
 use std::iter;
 
 /// Syncs the pixelation camera to the main camera.
@@ -126,16 +125,14 @@ pub(crate) fn update_pixelation(
 pub(crate) fn set_visible(
     mut pixelation_camera_query: Query<(&PixelationCamera, &mut VisibleEntities)>,
     children_query: Query<&Children>,
-    meshes: Query<&Handle<Mesh>>,
 ) {
     for (pixelation_camera, mut visible_entities) in pixelation_camera_query.iter_mut() {
         let parent = pixelation_camera.target;
         let descendants = children_query.iter_descendants(parent);
-        let hierarchy = iter::once(parent)
-            .chain(descendants)
-            .filter(|entity| meshes.contains(*entity))
-            .collect();
-        let new_visible_entities = TypeIdMap::from_iter([(TypeId::of::<WithMesh>(), hierarchy)]);
-        visible_entities.entities = new_visible_entities;
+        let allowed: HashSet<_> = iter::once(parent).chain(descendants).collect();
+
+        visible_entities
+            .get_mut::<WithMesh>()
+            .retain(|&entity| allowed.contains(&entity));
     }
 }

@@ -58,10 +58,11 @@
 //! }
 //! ```
 use bevy::prelude::*;
+use bevy::render::view::RenderLayers;
 
 /// Everything you need to get started
 pub mod prelude {
-    pub use crate::{Pixelate, PixelateMeshPlugin};
+    pub use crate::{Pixelate, PixelateMeshPlugin, PIXELATION_RENDER_LAYERS};
 }
 
 mod creation;
@@ -153,3 +154,7 @@ struct Canvas {
 struct PixelationCamera {
     pub(crate) target: Entity,
 }
+
+/// The render layers used by the plugin. All objects that will be pixelated are rendered on these layers.
+/// If you want light to affect them, you need to add the light to the same layers.
+pub const PIXELATION_RENDER_LAYERS: RenderLayers = RenderLayers::layer(1);

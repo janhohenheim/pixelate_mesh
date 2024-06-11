@@ -1,6 +1,6 @@
 use crate::ready_checks::PixelationTargetReadyEvent;
-use crate::util::{get_max_radius, get_pixelation_render_layer};
-use crate::{Canvas, Pixelate, PixelationCamera};
+use crate::util::get_max_radius;
+use crate::{Canvas, Pixelate, PixelationCamera, PIXELATION_RENDER_LAYERS};
 use bevy::pbr::{NotShadowCaster, NotShadowReceiver};
 use bevy::render::texture::ImageSampler;
 use bevy::{
@@ -37,8 +37,6 @@ pub(crate) fn add_pixelation(
     mut pixelation_target_ready_reader: EventReader<PixelationTargetReadyEvent>,
     mut ordering: ResMut<Ordering>,
 ) {
-    // This specifies the layer used for the first pass, which will be attached to the first pass camera and cube.
-    let first_pass_layer = get_pixelation_render_layer();
     for event in pixelation_target_ready_reader.read() {
         for (&entity, target) in event.iter() {
             debug!("Spawning canvas");
@@ -50,7 +48,7 @@ pub(crate) fn add_pixelation(
             let image_handle = images.add(image);
             commands
                 .entity(entity)
-                .insert((first_pass_layer.clone(), aabb));
+                .insert((PIXELATION_RENDER_LAYERS.clone(), aabb));
             commands.spawn((
                 Name::new("Pixelation Camera"),
                 Camera3dBundle {
@@ -64,7 +62,7 @@ pub(crate) fn add_pixelation(
                     ..default()
                 },
                 PixelationCamera { target: entity },
-                first_pass_layer.clone(),
+                PIXELATION_RENDER_LAYERS.clone(),
             ));
 
             commands

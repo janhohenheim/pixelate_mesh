@@ -42,5 +42,6 @@ fn setup(
             transform: Transform::from_translation(Vec3::new(0.0, 10.0, 10.0)),
             ..default()
         },
+        PIXELATION_RENDER_LAYERS.clone(),
     ));
 }

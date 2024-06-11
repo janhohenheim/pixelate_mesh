@@ -65,5 +65,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             },
             ..default()
         },
+        PIXELATION_RENDER_LAYERS.clone(),
     ));
 }
