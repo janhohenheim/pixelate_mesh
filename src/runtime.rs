@@ -2,8 +2,10 @@ use crate::creation::{create_canvas_image, create_canvas_material};
 use crate::util::get_max_radius;
 use crate::{Canvas, Pixelate, PixelationCamera};
 use bevy::render::camera::RenderTarget;
-use bevy::render::view::VisibleEntities;
+use bevy::render::view::{VisibleEntities, WithMesh};
+use bevy::utils::TypeIdMap;
 use bevy::{prelude::*, render::primitives::Aabb};
+use std::any::TypeId;
 use std::iter;
 
 /// Syncs the pixelation camera to the main camera.
@@ -133,6 +135,7 @@ pub(crate) fn set_visible(
             .chain(descendants)
             .filter(|entity| meshes.contains(*entity))
             .collect();
-        visible_entities.entities = hierarchy;
+        let new_visible_entities = TypeIdMap::from_iter([(TypeId::of::<WithMesh>(), hierarchy)]);
+        visible_entities.entities = new_visible_entities;
     }
 }

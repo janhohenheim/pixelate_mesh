@@ -48,7 +48,9 @@ pub(crate) fn add_pixelation(
             let pixelate = pixelate_query.get(entity).unwrap();
             let image = create_canvas_image(*pixelate);
             let image_handle = images.add(image);
-            commands.entity(entity).insert((first_pass_layer, aabb));
+            commands
+                .entity(entity)
+                .insert((first_pass_layer.clone(), aabb));
             commands.spawn((
                 Name::new("Pixelation Camera"),
                 Camera3dBundle {
@@ -62,7 +64,7 @@ pub(crate) fn add_pixelation(
                     ..default()
                 },
                 PixelationCamera { target: entity },
-                first_pass_layer,
+                first_pass_layer.clone(),
             ));
 
             commands
