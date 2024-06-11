@@ -15,11 +15,12 @@ Apply a pixelation effect to any Bevy mesh or scene without post-processing.
 The tracking component is needed because the plugin draws the textures on 2D canvases that need to rotate to always face the main camera.
 
 ## Compatibility
-| bevy | pixelate_mesh |
-|------|---------------|
-| 0.13 | 0.3           |
-| 0.12 | 0.2           |
-| 0.10 | 0.1           |
+| bevy        | pixelate_mesh |
+|-------------|---------------|
+| 0.14.0-rc.2 | 0.4.0-rc      |
+| 0.13        | 0.3           |
+| 0.12        | 0.2           |
+| 0.10        | 0.1           |
 
 ## Examples
 The following is an annotated minimal example. 

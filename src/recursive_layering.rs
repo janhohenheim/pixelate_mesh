@@ -18,7 +18,7 @@ pub(crate) fn recursively_set_layer(
                 PixelationTargetKind::Mesh => {
                     for child in children.iter_descendants(entity) {
                         if mesh_handles.contains(child) {
-                            commands.entity(child).insert(first_pass_layer);
+                            commands.entity(child).insert(first_pass_layer.clone());
                         }
                     }
                 }
@@ -26,7 +26,7 @@ pub(crate) fn recursively_set_layer(
                     let scene_instance = scene_instances.get(entity).unwrap();
                     for child in scene_spawner.iter_instance_entities(**scene_instance) {
                         if mesh_handles.contains(child) {
-                            commands.entity(child).insert(first_pass_layer);
+                            commands.entity(child).insert(first_pass_layer.clone());
                         }
                     }
                 }
