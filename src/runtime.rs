@@ -71,19 +71,23 @@ pub(crate) fn position_canvas<T: Component>(
 pub(crate) fn despawn_dependent_types(
     mut commands: Commands,
     mut removed_pixelate: RemovedComponents<Pixelate>,
-    canvas_query: Query<Entity, With<Canvas>>,
-    pixelation_camera_query: Query<Entity, With<PixelationCamera>>,
+    canvas_query: Query<(Entity, &Canvas)>,
+    pixelation_camera_query: Query<(Entity, &PixelationCamera)>,
 ) {
     for entity in removed_pixelate.read() {
         debug!("Pixelate was removed from an entity; removing canvas and pixelation camera that held it as target.");
-        for canvas in canvas_query.iter() {
-            if canvas == entity {
-                commands.entity(canvas).despawn_recursive();
+        for (canvas_entity, canvas) in canvas_query.iter() {
+            if canvas.target == entity {
+                debug!("canvas despawned.");
+                commands.entity(canvas_entity).despawn_recursive();
             }
         }
-        for pixelation_camera in pixelation_camera_query.iter() {
-            if pixelation_camera == entity {
-                commands.entity(pixelation_camera).despawn_recursive();
+        for (pixelation_camera_entity, pixelation_camera) in pixelation_camera_query.iter() {
+            if pixelation_camera.target == entity {
+                debug!("camera despawned.");
+                commands
+                    .entity(pixelation_camera_entity)
+                    .despawn_recursive();
             }
         }
     }
