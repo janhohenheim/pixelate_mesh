@@ -1,6 +1,6 @@
 [package]
 name = "pixelate_mesh"
-version = "0.4.0-rc.2"
+version = "0.4.0"
 authors = ["Jan Hohenheim <jan@hohenheim.ch>"]
 edition = "2021"
 exclude = ["assets", "docs"]
@@ -11,7 +11,7 @@ keywords = ["bevy", "pixelate", "pixelation", "mesh", "scene"]
 categories = ["game-development", "graphics", "rendering"]
 
 [dependencies.bevy]
-version = "0.14.0-rc.2"
+version = "0.14.0"
 default-features = false
 features = [
     "bevy_asset",
