@@ -1,7 +1,7 @@
 use crate::Pixelate;
+use bevy::platform_support::collections::{HashMap, HashSet};
 use bevy::prelude::*;
 use bevy::scene::SceneInstance;
-use bevy::utils::{HashMap, HashSet};
 
 #[derive(Debug, Resource, Reflect, Default, Deref, DerefMut)]
 #[reflect(Resource)]
@@ -43,7 +43,7 @@ pub(crate) fn get_ready_pixelation_targets(
     scene_spawner: Res<SceneSpawner>,
     mut pixelation_target_ready_event: EventWriter<PixelationTargetReadyEvent>,
 ) {
-    let mut pixelation_targets = HashMap::new();
+    let mut pixelation_targets = HashMap::default();
     for &entity in to_pixelate.iter() {
         let (mesh_handle, scene_handle, scene_instance) = pixelate_query.get(entity).unwrap();
         if scene_handle.is_some() {
@@ -86,5 +86,5 @@ pub(crate) fn get_ready_pixelation_targets(
     }
     let ready = pixelation_targets.keys().copied().collect();
     to_pixelate.0 = to_pixelate.difference(&ready).copied().collect();
-    pixelation_target_ready_event.send(PixelationTargetReadyEvent(pixelation_targets));
+    pixelation_target_ready_event.write(PixelationTargetReadyEvent(pixelation_targets));
 }

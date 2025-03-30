@@ -1,8 +1,8 @@
 use crate::ready_checks::{PixelationTargetKind, PixelationTargetReadyEvent};
 use bevy::pbr::NotShadowReceiver;
+use bevy::platform_support::collections::HashSet;
 use bevy::prelude::*;
 use bevy::scene::InstanceId;
-use bevy::utils::HashSet;
 
 #[derive(Debug, Clone, Resource, Deref, DerefMut)]
 pub(crate) struct ShadowMaterialHandle(Handle<StandardMaterial>);
@@ -67,7 +67,7 @@ pub(crate) fn add_shadow_caster(
 
 fn duplicate_children(
     entity: Entity,
-    child_builder: &mut ChildBuilder,
+    child_builder: &mut ChildSpawnerCommands,
     children: &Query<&Children>,
     mesh_handles: &Query<&Mesh3d>,
     shadow_material_handle: &Handle<StandardMaterial>,
@@ -85,7 +85,7 @@ fn duplicate_children(
             return;
         }
     };
-    for &child in children_entities.iter() {
+    for child in children_entities.iter() {
         entity_commands.with_children(|parent| {
             duplicate_children(
                 child,
@@ -105,7 +105,7 @@ pub(crate) fn set_scene_shadow(
     shadow_material_handle: Res<ShadowMaterialHandle>,
     mesh_query: Query<&Mesh3d>,
 ) {
-    let mut done = HashSet::new();
+    let mut done = HashSet::default();
     for instance_id in set_scene_shadow.iter() {
         if scene_spawner.instance_is_ready(*instance_id) {
             done.insert(*instance_id);

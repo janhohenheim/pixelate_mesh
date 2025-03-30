@@ -44,8 +44,9 @@ fn move_pixelated(time: Res<Time>, mut pixelated: Query<&mut Transform, With<Pix
         let (sin, cos) = time.elapsed_secs().sin_cos();
         let sin = sin * sin * sin;
         let cos = cos * cos * cos;
-        transform.translation.x += sin;
-        transform.translation.z += cos;
-        transform.translation.y = sin.abs() * 20.0;
+        transform.translation.x = sin * 80.0;
+        transform.translation.z = cos * 80.0;
+        transform.translation.y = sin.abs() * 10.0;
+        transform.look_at(Vec3::new(0.0, 0.0, -200.0), Vec3::Y);
     }
 }
