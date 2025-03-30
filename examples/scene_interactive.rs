@@ -18,36 +18,23 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         Name::new("Fox"),
         Pixelate::splat(128),
-        SceneBundle {
-            scene: asset_server.load("Fox.glb#Scene0"),
-            ..default()
-        },
+        SceneRoot(asset_server.load("Fox.glb#Scene0")),
     ));
 
     commands.spawn((
         Name::new("Camera"),
         MainCamera,
-        Camera3dBundle {
-            transform: Transform::from_xyz(0.0, 150.0, 300.0),
-            ..default()
-        },
+        Camera3d::default(),
+        Transform::from_xyz(0.0, 150.0, 300.0),
     ));
 
     commands.spawn((
         Name::new("Light"),
-        DirectionalLightBundle {
-            transform: Transform::from_rotation(Quat::from_euler(
-                EulerRot::ZYX,
-                0.0,
-                1.0,
-                -PI / 4.,
-            )),
-            directional_light: DirectionalLight {
-                shadows_enabled: true,
-                ..default()
-            },
+        DirectionalLight {
+            shadows_enabled: true,
             ..default()
         },
+        Transform::from_rotation(Quat::from_euler(EulerRot::ZYX, 0.0, 1.0, -PI / 4.)),
         PIXELATION_RENDER_LAYERS.clone(),
     ));
 }
@@ -57,7 +44,7 @@ fn move_camera(
     mut query: Query<&mut Transform, With<MainCamera>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
 ) {
-    let dt = time.delta_seconds();
+    let dt = time.delta_secs();
     let mut camera_transform = query.single_mut();
     let total_motion: Vec2 = mouse_motion_events.read().map(|e| e.delta).sum();
     let sensitivity = 0.1;

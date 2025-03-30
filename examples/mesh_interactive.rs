@@ -21,34 +21,26 @@ fn setup(
     commands.spawn((
         Name::new("Cube"),
         Pixelate::splat(64),
-        PbrBundle {
-            mesh: meshes.add(Mesh::from(Cuboid::default())),
-            material: materials.add(StandardMaterial::from(Color::WHITE)),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..default()
-        },
+        Mesh3d(meshes.add(Mesh::from(Cuboid::default()))),
+        MeshMaterial3d(materials.add(StandardMaterial::from(Color::WHITE))),
+        Transform::from_xyz(0.0, 0.5, 0.0),
     ));
 
     commands.spawn((
         Name::new("Camera"),
         MainCamera,
-        Camera3dBundle {
-            transform: Transform::from_xyz(0., 0., 5.0).looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        },
+        Camera3d::default(),
+        Transform::from_xyz(0., 0., 5.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
     commands.spawn((
         Name::new("Light"),
-        PointLightBundle {
-            point_light: PointLight {
-                shadows_enabled: true,
-                shadow_depth_bias: 0.05,
-                ..Default::default()
-            },
-            transform: Transform::from_translation(Vec3::new(5.0, 10.0, 10.0)),
+        PointLight {
+            shadows_enabled: true,
+            shadow_depth_bias: 0.05,
             ..default()
         },
+        Transform::from_translation(Vec3::new(5.0, 10.0, 10.0)),
         PIXELATION_RENDER_LAYERS.clone(),
     ));
 }
@@ -58,7 +50,7 @@ fn move_camera(
     mut query: Query<&mut Transform, With<MainCamera>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
 ) {
-    let dt = time.delta_seconds();
+    let dt = time.delta_secs();
     let mut camera_transform = query.single_mut();
     let total_motion: Vec2 = mouse_motion_events.read().map(|e| e.delta).sum();
     let sensitivity = 0.1;

@@ -22,7 +22,7 @@ pub(crate) struct PixelationTargetReadyEvent(HashMap<Entity, PixelationTarget>);
 
 #[derive(Debug, Clone)]
 pub(crate) struct PixelationTarget {
-    pub(crate) mesh_handle: Handle<Mesh>,
+    pub(crate) mesh_handle: Mesh3d,
     pub(crate) kind: PixelationTargetKind,
 }
 
@@ -35,14 +35,10 @@ pub(crate) enum PixelationTargetKind {
 pub(crate) fn get_ready_pixelation_targets(
     mut to_pixelate: ResMut<ToPixelate>,
     pixelate_query: Query<
-        (
-            Option<&Handle<Mesh>>,
-            Option<&Handle<Scene>>,
-            Option<&SceneInstance>,
-        ),
+        (Option<&Mesh3d>, Option<&SceneRoot>, Option<&SceneInstance>),
         With<Pixelate>,
     >,
-    mesh_handles: Query<&Handle<Mesh>>,
+    mesh_handles: Query<&Mesh3d>,
     meshes: Res<Assets<Mesh>>,
     scene_spawner: Res<SceneSpawner>,
     mut pixelation_target_ready_event: EventWriter<PixelationTargetReadyEvent>,

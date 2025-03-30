@@ -96,7 +96,6 @@ where
             .init_resource::<ready_checks::ToPixelate>()
             .init_resource::<creation::Ordering>()
             .init_resource::<shadow::SetSceneShadow>()
-            .insert_resource(Msaa::Off)
             .add_event::<ready_checks::PixelationTargetReadyEvent>()
             .add_systems(Startup, shadow::create_shadow_material)
             .add_systems(
@@ -158,3 +157,7 @@ struct PixelationCamera {
 /// The render layers used by the plugin. All objects that will be pixelated are rendered on these layers.
 /// If you want light to affect them, you need to add the light to the same layers.
 pub const PIXELATION_RENDER_LAYERS: RenderLayers = RenderLayers::layer(1);
+
+#[cfg(doctest)]
+#[doc = include_str!("../readme.md")]
+mod test_readme {}

@@ -1,8 +1,9 @@
 use crate::ready_checks::PixelationTargetReadyEvent;
 use crate::util::get_max_radius;
 use crate::{Canvas, Pixelate, PixelationCamera, PIXELATION_RENDER_LAYERS};
+use bevy::image::ImageSampler;
 use bevy::pbr::{NotShadowCaster, NotShadowReceiver};
-use bevy::render::texture::ImageSampler;
+use bevy::render::mesh::MeshAabb as _;
 use bevy::{
     prelude::*,
     render::{
@@ -51,16 +52,14 @@ pub(crate) fn add_pixelation(
                 .insert((PIXELATION_RENDER_LAYERS.clone(), aabb));
             commands.spawn((
                 Name::new("Pixelation Camera"),
-                Camera3dBundle {
-                    camera: Camera {
-                        order: ordering.next(),
-                        target: RenderTarget::Image(image_handle.clone()),
-                        clear_color: ClearColorConfig::Custom(Color::NONE),
-                        msaa_writeback: false,
-                        ..default()
-                    },
+                Camera {
+                    order: ordering.next(),
+                    target: RenderTarget::Image(image_handle.clone()),
+                    clear_color: ClearColorConfig::Custom(Color::NONE),
+                    msaa_writeback: false,
                     ..default()
                 },
+                Camera3d::default(),
                 PixelationCamera { target: entity },
                 PIXELATION_RENDER_LAYERS.clone(),
             ));
@@ -69,17 +68,15 @@ pub(crate) fn add_pixelation(
                 .spawn((
                     Name::new("Canvas"),
                     Canvas { target: entity },
-                    SpatialBundle::default(),
+                    Transform::default(),
+                    Visibility::default(),
                 ))
                 .with_children(|parent| {
                     parent.spawn((
                         Name::new("Canvas Mesh"),
-                        PbrBundle {
-                            mesh: plane_handle,
-                            material: materials.add(create_canvas_material(image_handle)),
-                            transform: Transform::from_rotation(Quat::from_rotation_y(PI)),
-                            ..default()
-                        },
+                        Mesh3d(plane_handle),
+                        MeshMaterial3d(materials.add(create_canvas_material(image_handle))),
+                        Transform::from_rotation(Quat::from_rotation_y(PI)),
                         NotShadowCaster,
                         NotShadowReceiver,
                     ));
