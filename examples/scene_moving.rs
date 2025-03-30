@@ -18,44 +18,30 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         Name::new("Fox"),
         Pixelate::splat(128),
-        SceneBundle {
-            scene: asset_server.load("Fox.glb#Scene0"),
-            ..default()
-        },
+        SceneRoot(asset_server.load("Fox.glb#Scene0")),
     ));
 
     commands.spawn((
         Name::new("Camera"),
         MainCamera,
-        Camera3dBundle {
-            transform: Transform::from_xyz(0.0, 120.0, 200.0)
-                .looking_at(Vec3::new(0.0, 20.0, 0.0), Vec3::Y),
-            ..default()
-        },
+        Camera3d::default(),
+        Transform::from_xyz(0.0, 120.0, 200.0).looking_at(Vec3::new(0.0, 20.0, 0.0), Vec3::Y),
     ));
 
     commands.spawn((
         Name::new("Light"),
-        DirectionalLightBundle {
-            transform: Transform::from_rotation(Quat::from_euler(
-                EulerRot::ZYX,
-                0.0,
-                1.0,
-                -PI / 4.,
-            )),
-            directional_light: DirectionalLight {
-                shadows_enabled: true,
-                ..default()
-            },
+        DirectionalLight {
+            shadows_enabled: true,
             ..default()
         },
+        Transform::from_rotation(Quat::from_euler(EulerRot::ZYX, 0.0, 1.0, -PI / 4.)),
         PIXELATION_RENDER_LAYERS.clone(),
     ));
 }
 
 fn move_pixelated(time: Res<Time>, mut pixelated: Query<&mut Transform, With<Pixelate>>) {
     for mut transform in pixelated.iter_mut() {
-        let (sin, cos) = time.elapsed_seconds().sin_cos();
+        let (sin, cos) = time.elapsed_secs().sin_cos();
         let sin = sin * sin * sin;
         let cos = cos * cos * cos;
         transform.translation.x += sin;

@@ -7,7 +7,7 @@ pub(crate) fn recursively_set_layer(
     mut commands: Commands,
     mut ready_events: EventReader<PixelationTargetReadyEvent>,
     children: Query<&Children>,
-    mesh_handles: Query<&Handle<Mesh>>,
+    mesh_handles: Query<&Mesh3d>,
     scene_instances: Query<&SceneInstance>,
     scene_spawner: Res<SceneSpawner>,
 ) {

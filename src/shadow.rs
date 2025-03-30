@@ -26,9 +26,9 @@ pub(crate) fn create_shadow_material(
 pub(crate) fn add_shadow_caster(
     mut commands: Commands,
     mut ready_event: EventReader<PixelationTargetReadyEvent>,
-    mesh_handles: Query<&Handle<Mesh>>,
+    mesh_handles: Query<&Mesh3d>,
     children: Query<&Children>,
-    scene_handles: Query<&Handle<Scene>>,
+    scene_handles: Query<&SceneRoot>,
     mut scene_spawner: ResMut<SceneSpawner>,
     shadow_material_handle: Res<ShadowMaterialHandle>,
     mut set_scene_shadow: ResMut<SetSceneShadow>,
@@ -39,7 +39,11 @@ pub(crate) fn add_shadow_caster(
                 PixelationTargetKind::Mesh => {
                     commands.entity(entity).with_children(|parent| {
                         parent
-                            .spawn((Name::new("Pixelation Shadow"), SpatialBundle::default()))
+                            .spawn((
+                                Name::new("Pixelation Shadow"),
+                                Transform::default(),
+                                Visibility::default(),
+                            ))
                             .with_children(|parent| {
                                 duplicate_children(
                                     entity,
@@ -53,7 +57,7 @@ pub(crate) fn add_shadow_caster(
                 }
                 PixelationTargetKind::Scene => {
                     let scene_handle = scene_handles.get(entity).unwrap();
-                    let instance_id = scene_spawner.spawn_as_child(scene_handle.clone(), entity);
+                    let instance_id = scene_spawner.spawn_as_child(scene_handle.0.clone(), entity);
                     set_scene_shadow.insert(instance_id);
                 }
             }
@@ -65,16 +69,15 @@ fn duplicate_children(
     entity: Entity,
     child_builder: &mut ChildBuilder,
     children: &Query<&Children>,
-    mesh_handles: &Query<&Handle<Mesh>>,
+    mesh_handles: &Query<&Mesh3d>,
     shadow_material_handle: &Handle<StandardMaterial>,
 ) {
     let mut entity_commands = child_builder.spawn_empty();
     if let Ok(mesh_handle) = mesh_handles.get(entity) {
-        entity_commands.insert(PbrBundle {
-            mesh: mesh_handle.clone(),
-            material: shadow_material_handle.clone(),
-            ..Default::default()
-        });
+        entity_commands.insert((
+            mesh_handle.clone(),
+            MeshMaterial3d(shadow_material_handle.clone()),
+        ));
     }
     let children_entities = match children.get(entity) {
         Ok(children) => children,
@@ -100,7 +103,7 @@ pub(crate) fn set_scene_shadow(
     mut set_scene_shadow: ResMut<SetSceneShadow>,
     scene_spawner: Res<SceneSpawner>,
     shadow_material_handle: Res<ShadowMaterialHandle>,
-    mesh_query: Query<&Handle<Mesh>>,
+    mesh_query: Query<&Mesh3d>,
 ) {
     let mut done = HashSet::new();
     for instance_id in set_scene_shadow.iter() {
@@ -112,9 +115,10 @@ pub(crate) fn set_scene_shadow(
     for instance_id in done {
         for entity in scene_spawner.iter_instance_entities(instance_id) {
             if mesh_query.contains(entity) {
-                commands
-                    .entity(entity)
-                    .insert((NotShadowReceiver, shadow_material_handle.0.clone()));
+                commands.entity(entity).insert((
+                    NotShadowReceiver,
+                    MeshMaterial3d(shadow_material_handle.0.clone()),
+                ));
             }
         }
     }

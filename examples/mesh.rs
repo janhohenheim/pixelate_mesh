@@ -20,28 +20,21 @@ fn setup(
     commands.spawn((
         Name::new("Cube"),
         Pixelate::splat(64),
-        PbrBundle {
-            mesh: meshes.add(Mesh::from(Cuboid::default())),
-            material: materials.add(StandardMaterial::from(Color::WHITE)),
-            ..default()
-        },
+        Mesh3d(meshes.add(Mesh::from(Cuboid::default()))),
+        MeshMaterial3d(materials.add(StandardMaterial::from(Color::WHITE))),
     ));
 
     commands.spawn((
         Name::new("Camera"),
         MainCamera,
-        Camera3dBundle {
-            transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        },
+        Camera3d::default(),
+        Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
     commands.spawn((
         Name::new("Light"),
-        PointLightBundle {
-            transform: Transform::from_translation(Vec3::new(0.0, 10.0, 10.0)),
-            ..default()
-        },
+        PointLight::default(),
+        Transform::from_translation(Vec3::new(0.0, 10.0, 10.0)),
         PIXELATION_RENDER_LAYERS.clone(),
     ));
 }

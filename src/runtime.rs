@@ -2,7 +2,7 @@ use crate::creation::{create_canvas_image, create_canvas_material};
 use crate::util::get_max_radius;
 use crate::{Canvas, Pixelate, PixelationCamera};
 use bevy::render::camera::RenderTarget;
-use bevy::render::view::{VisibleEntities, WithMesh};
+use bevy::render::view::VisibleEntities;
 use bevy::utils::HashSet;
 use bevy::{prelude::*, render::primitives::Aabb};
 use std::iter;
@@ -94,7 +94,7 @@ pub(crate) fn update_pixelation(
     pixelate_query: Query<(Entity, &Pixelate), Changed<Pixelate>>,
     mut pixelation_camera_query: Query<(&PixelationCamera, &mut Camera)>,
     canvas_query: Query<(&Canvas, &Children)>,
-    with_standard_material: Query<Entity, With<Handle<StandardMaterial>>>,
+    with_standard_material: Query<Entity, With<MeshMaterial3d<StandardMaterial>>>,
     mut standard_materials: ResMut<Assets<StandardMaterial>>,
     mut images: ResMut<Assets<Image>>,
 ) {
@@ -115,7 +115,9 @@ pub(crate) fn update_pixelation(
                     camera.target = RenderTarget::Image(image_handle.clone());
                     let material_handle =
                         standard_materials.add(create_canvas_material(image_handle));
-                    commands.entity(*entity).insert(material_handle);
+                    commands
+                        .entity(*entity)
+                        .insert(MeshMaterial3d(material_handle));
                 }
             }
         }
@@ -132,7 +134,7 @@ pub(crate) fn set_visible(
         let allowed: HashSet<_> = iter::once(parent).chain(descendants).collect();
 
         visible_entities
-            .get_mut::<WithMesh>()
+            .get_mut::<With<Mesh3d>>()
             .retain(|&entity| allowed.contains(&entity));
     }
 }
