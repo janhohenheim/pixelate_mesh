@@ -1,6 +1,6 @@
 [package]
 name = "pixelate_mesh"
-version = "0.5.0"
+version = "0.6.0-rc.1"
 authors = ["Jan Hohenheim <jan@hohenheim.ch>"]
 edition = "2021"
 exclude = ["assets", "docs"]
@@ -11,12 +11,11 @@ keywords = ["bevy", "pixelate", "pixelation", "mesh", "scene"]
 categories = ["game-development", "graphics", "rendering"]
 
 [dependencies.bevy]
-version = "0.15.0"
+version = "0.16.0-rc"
 default-features = false
 features = [
     "bevy_asset",
     "bevy_winit",
-    "x11",
     "bevy_render",
     "bevy_core_pipeline",
     "bevy_scene",
@@ -26,4 +25,10 @@ features = [
     "bevy_gltf",
     "png",
     "tonemapping_luts",
+    "bevy_log",
+    "std",
 ]
+
+[dev-dependencies.bevy]
+version = "0.16.0-rc"
+default-features = true

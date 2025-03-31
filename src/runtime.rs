@@ -1,10 +1,11 @@
 use crate::creation::{create_canvas_image, create_canvas_material};
 use crate::util::get_max_radius;
 use crate::{Canvas, Pixelate, PixelationCamera};
+use bevy::platform_support::collections::HashSet;
 use bevy::render::camera::RenderTarget;
 use bevy::render::view::VisibleEntities;
-use bevy::utils::HashSet;
 use bevy::{prelude::*, render::primitives::Aabb};
+use std::any::TypeId;
 use std::iter;
 
 /// Syncs the pixelation camera to the main camera.
@@ -33,9 +34,9 @@ pub(crate) fn sync_cameras<T: Component>(
                 pixelation_camera_transform.translation += back * radius * DISTANCE_FACTOR;
             } else {
                 debug!("Despawning pixelation camera because it holds an invalid target.");
-                commands.entity(entity).despawn_recursive();
-                if let Some(entity_commands) = commands.get_entity(pixelation_camera.target) {
-                    entity_commands.despawn_recursive();
+                commands.entity(entity).despawn();
+                if let Ok(mut entity_commands) = commands.get_entity(pixelation_camera.target) {
+                    entity_commands.despawn();
                 }
             }
         }
@@ -60,9 +61,9 @@ pub(crate) fn position_canvas<T: Component>(
             }
         } else {
             debug!("Despawning canvas because it holds an invalid target.");
-            commands.entity(entity).despawn_recursive();
-            if let Some(entity_commands) = commands.get_entity(canvas.target) {
-                entity_commands.despawn_recursive();
+            commands.entity(entity).despawn();
+            if let Ok(mut entity_commands) = commands.get_entity(canvas.target) {
+                entity_commands.despawn();
             }
         }
     }
@@ -78,12 +79,12 @@ pub(crate) fn despawn_dependent_types(
         debug!("Pixelate was removed from an entity; removing canvas and pixelation camera that held it as target.");
         for canvas in canvas_query.iter() {
             if canvas == entity {
-                commands.entity(canvas).despawn_recursive();
+                commands.entity(canvas).despawn();
             }
         }
         for pixelation_camera in pixelation_camera_query.iter() {
             if pixelation_camera == entity {
-                commands.entity(pixelation_camera).despawn_recursive();
+                commands.entity(pixelation_camera).despawn();
             }
         }
     }
@@ -109,14 +110,14 @@ pub(crate) fn update_pixelation(
             {
                 if let Some(entity) = children
                     .iter()
-                    .find(|entity| with_standard_material.contains(**entity))
+                    .find(|entity| with_standard_material.contains(*entity))
                 {
                     let image_handle = images.add(create_canvas_image(*pixelate));
-                    camera.target = RenderTarget::Image(image_handle.clone());
+                    camera.target = RenderTarget::Image(image_handle.clone().into());
                     let material_handle =
                         standard_materials.add(create_canvas_material(image_handle));
                     commands
-                        .entity(*entity)
+                        .entity(entity)
                         .insert(MeshMaterial3d(material_handle));
                 }
             }
@@ -134,7 +135,7 @@ pub(crate) fn set_visible(
         let allowed: HashSet<_> = iter::once(parent).chain(descendants).collect();
 
         visible_entities
-            .get_mut::<With<Mesh3d>>()
+            .get_mut(TypeId::of::<With<Mesh3d>>())
             .retain(|&entity| allowed.contains(&entity));
     }
 }

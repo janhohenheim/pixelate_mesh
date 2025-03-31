@@ -54,7 +54,7 @@ pub(crate) fn add_pixelation(
                 Name::new("Pixelation Camera"),
                 Camera {
                     order: ordering.next(),
-                    target: RenderTarget::Image(image_handle.clone()),
+                    target: RenderTarget::Image(image_handle.clone().into()),
                     clear_color: ClearColorConfig::Custom(Color::NONE),
                     msaa_writeback: false,
                     ..default()

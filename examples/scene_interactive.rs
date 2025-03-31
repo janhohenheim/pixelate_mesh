@@ -41,11 +41,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn move_camera(
     time: Res<Time>,
-    mut query: Query<&mut Transform, With<MainCamera>>,
+    mut camera_transform: Single<&mut Transform, With<MainCamera>>,
     mut mouse_motion_events: EventReader<MouseMotion>,
 ) {
     let dt = time.delta_secs();
-    let mut camera_transform = query.single_mut();
     let total_motion: Vec2 = mouse_motion_events.read().map(|e| e.delta).sum();
     let sensitivity = 0.1;
     let motion = total_motion * sensitivity * dt;
