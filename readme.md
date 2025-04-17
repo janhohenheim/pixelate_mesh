@@ -1,3 +1,12 @@
+> [!IMPORTANT]
+> This plugin is no longer maintained, as I have come to believe that the approach used here is not correct.
+> There's quite a few issues with visibility around corners. I think deferred rendering would solve this,
+> but I don't have the time to properly implement that properly.
+> 
+> If you still want a simple way to achieve the effects shown in the readme and examples,
+> I recommend following the official [Pixed Grid Snapping](https://bevyengine.org/examples/2d-rendering/pixel-grid-snap/) example, as that is quite easy to implement.
+> If you really need this plugin to still exist, ping me on Discord or send me an email and I'll update it again :)
+
 # Pixelate Mesh
 
 [![crates.io](https://img.shields.io/crates/v/pixelate_mesh)](https://crates.io/crates/pixelate_mesh)
